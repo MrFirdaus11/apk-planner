@@ -1,0 +1,268 @@
+/* ─── BOTTOM NAVIGATION ─────────────────────────────────────── */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  height: 72px;
+  background: var(--surface);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 var(--space-2);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 200;
+  box-shadow: 0 -4px 20px rgba(108,60,225,0.06);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 56px;
+  text-decoration: none;
+  color: var(--text-tertiary);
+  position: relative;
+}
+
+.nav-item:hover { background: var(--primary-lighter); color: var(--primary); }
+
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item.active .nav-icon-wrap {
+  background: var(--primary-light);
+  border-radius: var(--radius-md);
+}
+
+.nav-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 28px;
+  transition: all var(--transition-fast);
+}
+
+.nav-label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ─── MODAL / BOTTOM SHEET ──────────────────────────────────── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: backdropIn 0.25s ease;
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 430px;
+  background: var(--surface);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  padding: var(--space-6);
+  padding-bottom: calc(var(--space-6) + env(safe-area-inset-bottom, 0));
+  max-height: 92vh;
+  overflow-y: auto;
+  animation: sheetUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-sheet::-webkit-scrollbar { display: none; }
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  margin: 0 auto var(--space-5);
+}
+
+.modal-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-5);
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.modal-actions .btn { flex: 1; }
+
+/* ─── TOAST NOTIFICATION ─────────────────────────────────────── */
+#toast-container {
+  position: fixed;
+  top: var(--space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  max-width: 380px;
+  padding: 0 var(--space-4);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  background: var(--text);
+  color: var(--white);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  pointer-events: all;
+}
+
+.toast-success { background: #065F46; }
+.toast-error   { background: #991B1B; }
+.toast-info    { background: var(--primary-dark); }
+
+.toast-icon { font-size: var(--text-lg); flex-shrink: 0; }
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.9); }
+}
+
+/* ─── CHECKBOX ───────────────────────────────────────────────── */
+.checkbox-custom {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.checkbox-custom.checked {
+  background: var(--primary-gradient);
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(108,60,225,0.3);
+}
+
+/* ─── PILL TOGGLE ────────────────────────────────────────────── */
+.pill-toggle {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  gap: 2px;
+  border: 1px solid var(--border-light);
+}
+
+.pill-toggle-btn {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pill-toggle-btn.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── HEADER COMMON ─────────────────────────────────────────── */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-5) 0;
+}
+
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ─── SECTION LABEL ─────────────────────────────────────────── */
+.section-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* ─── STAT CARD ─────────────────────────────────────────────── */
+.stat-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon-primary { background: var(--primary-light); color: var(--primary); }
+.stat-icon-success { background: var(--success-bg); color: var(--success); }
+.stat-icon-warning { background: var(--warning-bg); color: var(--warning); }
+
+/* ─── DARK MODE ───────────────────────────────────────────────── */
+[data-theme="dark"] .bottom-nav {
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+  border-top-color: var(--border);
+}
+
+[data-theme="dark"] .modal-backdrop {
+  background: rgba(0,0,0,0.7);
+}
+
+[data-theme="dark"] .toast-success { background: #065F46; }
+[data-theme="dark"] .toast-error   { background: #991B1B; }

@@ -1,0 +1,515 @@
+/* ============================================================
+   PROGRES / STATISTIK PAGE
+   ============================================================ */
+
+/* ─── PAGE WRAPPER ──────────────────────────────────────────── */
+.progres-page {
+  padding: 0 0 var(--space-8);
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* ─── HEADER ────────────────────────────────────────────────── */
+.progres-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-6) var(--space-5) var(--space-4);
+}
+
+.progres-header-left .page-title {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.progres-header-left .page-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.progres-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--primary-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.375rem;
+  color: var(--white);
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(108, 60, 225, 0.3);
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.progres-avatar:hover { transform: scale(1.06); }
+
+/* ─── TOGGLE PERIODE ────────────────────────────────────────── */
+.periode-toggle-wrap {
+  padding: 0 var(--space-5) var(--space-5);
+}
+
+/* ─── CONTENT SECTIONS ──────────────────────────────────────── */
+.progres-content {
+  padding: 0 var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ─── SKOR PROGRES CARD ─────────────────────────────────────── */
+.skor-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.skor-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.skor-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.skor-tren-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #0D9488, #14B8A6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+  flex-shrink: 0;
+}
+
+.skor-tren-icon svg { display: block; }
+
+.skor-angka-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: var(--space-4);
+}
+
+.skor-angka-besar {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.skor-angka-dari {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.skor-penyelesaian {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.skor-penyelesaian-label {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.skor-penyelesaian-persen {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--success);
+}
+
+.skor-progress-track {
+  width: 100%;
+  height: 10px;
+  background: var(--border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.skor-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, #10B981, #0D9488, #14B8A6);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── TOTAL FOKUS CARD ──────────────────────────────────────── */
+.fokus-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+}
+
+.fokus-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  margin-bottom: var(--space-1);
+}
+
+.fokus-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.fokus-angka {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.fokus-perbandingan {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fokus-perbandingan.naik { color: var(--success); }
+.fokus-perbandingan.turun { color: var(--danger); }
+
+/* ─── AKTIVITAS MINGGUAN CARD ───────────────────────────────── */
+.aktivitas-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+}
+
+.aktivitas-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.aktivitas-card-header h3 {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.aktivitas-detail-link {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast);
+  text-decoration: none;
+}
+
+.aktivitas-detail-link:hover { background: var(--primary-lighter); }
+
+/* ─── BAR CHART ─────────────────────────────────────────────── */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-2);
+  height: 120px;
+  padding: 0 4px;
+}
+
+.bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  height: 100%;
+  gap: var(--space-2);
+}
+
+.bar-column-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar-column {
+  width: 100%;
+  max-width: 32px;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  transform-origin: bottom center;
+  animation: barRise 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  cursor: pointer;
+  transition: filter var(--transition-fast), transform var(--transition-fast);
+}
+
+.bar-column:hover {
+  filter: brightness(1.1);
+  transform: scaleY(1.04);
+}
+
+.bar-column.bar-empty {
+  background: var(--border);
+  min-height: 4px;
+}
+
+.bar-column.bar-normal {
+  background: var(--chart-bar);
+}
+
+.bar-column.bar-active {
+  background: var(--primary-gradient);
+  box-shadow: 0 4px 12px rgba(108, 60, 225, 0.4);
+}
+
+/* Stagger animation */
+.bar-item:nth-child(1) .bar-column { animation-delay: 0ms; }
+.bar-item:nth-child(2) .bar-column { animation-delay: 50ms; }
+.bar-item:nth-child(3) .bar-column { animation-delay: 100ms; }
+.bar-item:nth-child(4) .bar-column { animation-delay: 150ms; }
+.bar-item:nth-child(5) .bar-column { animation-delay: 200ms; }
+.bar-item:nth-child(6) .bar-column { animation-delay: 250ms; }
+.bar-item:nth-child(7) .bar-column { animation-delay: 300ms; }
+
+@keyframes barRise {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+.bar-day-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-align: center;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.bar-day-label.active-day {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ─── STREAK MANIFESTASI CARD ───────────────────────────────── */
+.streak-card {
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #EDE9FE 0%, #F3E8FF 50%, #E0E7FF 100%);
+  border: 1px solid #DDD6FE;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.streak-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, #0D9488, #14B8A6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.35);
+}
+
+.streak-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.streak-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7C3AED;
+  margin-bottom: 2px;
+}
+
+.streak-angka-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.streak-angka {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text);
+  line-height: 1;
+}
+
+.streak-hari-text {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.streak-motivasi {
+  font-size: var(--text-xs);
+  color: #7C3AED;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* ─── INSIGHT CARD ──────────────────────────────────────────── */
+.insight-card {
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 70%);
+  border: 1px solid #FDE68A;
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+}
+
+.insight-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #F59E0B, #FBBF24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+}
+
+.insight-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.insight-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #B45309;
+  margin-bottom: var(--space-2);
+}
+
+.insight-teks {
+  font-size: var(--text-sm);
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.insight-teks strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ─── LOADING SKELETON ──────────────────────────────────────── */
+.progres-loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: 0 var(--space-5);
+}
+
+.progres-skeleton-card {
+  height: 140px;
+  border-radius: var(--radius-xl);
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 360px) {
+  .skor-angka-besar { font-size: 2.75rem; }
+  .bar-chart { height: 96px; }
+  .bar-column { max-width: 26px; }
+  .bar-day-label { font-size: 0.6rem; }
+  .fokus-angka { font-size: 2rem; }
+}
+
+/* ─── DARK MODE ───────────────────────────────────────────────── */
+[data-theme="dark"] .streak-card {
+  background: linear-gradient(135deg, #1F1448 0%, #2D1F5E 50%, #1A1A2E 100%);
+  border-color: #3D2E7C;
+}
+
+[data-theme="dark"] .streak-label,
+[data-theme="dark"] .streak-motivasi {
+  color: #9B5FF0;
+}
+
+[data-theme="dark"] .insight-card {
+  background: linear-gradient(135deg, #2D1F1E 0%, #1A1A2E 70%);
+  border-color: #5D3F1E;
+}
+
+[data-theme="dark"] .insight-icon-wrap {
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .skor-tren-icon {
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+[data-theme="dark"] .streak-icon-wrap {
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+[data-theme="dark"] .skor-progress-fill {
+  background: linear-gradient(90deg, #059669, #0D9488, #10B981);
+}
+
+[data-theme="dark"] .skor-angka-besar {
+  color: var(--text);
+}
+
+[data-theme="dark"] .progres-avatar {
+  background: var(--surface-2);
+}
+
+[data-theme="dark"] .progres-loading .skeleton {
+  background: var(--surface);
+}

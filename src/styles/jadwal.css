@@ -1,0 +1,657 @@
+/* ============================================================
+   HALAMAN JADWAL - STYLES
+   ============================================================ */
+
+/* ─── JADWAL HEADER ─────────────────────────────────────────── */
+.jadwal-header {
+  padding: var(--space-5) var(--space-5) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.jadwal-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.jadwal-tanggal-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.jadwal-tanggal-value {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+/* ─── SECTION TITLE ─────────────────────────────────────────── */
+.jadwal-section-title {
+  padding: var(--space-5) var(--space-5) 0;
+}
+
+.jadwal-section-title h2 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text);
+  position: relative;
+  display: inline-block;
+  padding-bottom: var(--space-2);
+}
+
+.jadwal-section-title h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-full);
+}
+
+/* ─── DATE PICKER ────────────────────────────────────────────── */
+.date-picker-wrapper {
+  padding: var(--space-4) 0 0;
+  overflow: hidden;
+}
+
+.date-picker-scroll {
+  display: flex;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-5);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.date-picker-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.date-day-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 46px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  border: 1.5px solid transparent;
+}
+
+.date-day-item:hover {
+  background: var(--primary-lighter);
+  border-color: var(--primary-light);
+}
+
+.date-day-item.active {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(108, 60, 225, 0.35);
+}
+
+.date-day-name {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.date-day-number {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.date-day-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.date-day-item.has-jadwal .date-day-dot {
+  opacity: 1;
+}
+
+.date-day-item.active .date-day-name,
+.date-day-item.active .date-day-number {
+  color: var(--white);
+}
+
+.date-day-item.active .date-day-dot {
+  background: rgba(255,255,255,0.7);
+}
+
+.date-day-item.today:not(.active) .date-day-number {
+  color: var(--primary);
+}
+
+/* ─── KEMAJUAN CARD ──────────────────────────────────────────── */
+.kemajuan-card {
+  margin: var(--space-4) var(--space-5) 0;
+  padding: var(--space-4) var(--space-5);
+}
+
+.kemajuan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.kemajuan-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.kemajuan-title svg {
+  color: var(--primary);
+}
+
+.kemajuan-persen {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.kemajuan-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+
+.kemajuan-count {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.kemajuan-status {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--primary);
+}
+
+/* ─── TIMELINE ───────────────────────────────────────────────── */
+.timeline-section {
+  padding: var(--space-5) var(--space-5) 0;
+}
+
+.timeline-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.timeline-section-header h3 {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.timeline-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  position: relative;
+  padding-bottom: var(--space-4);
+}
+
+/* Garis vertikal kiri */
+.timeline-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 42px;
+  top: 24px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-light);
+  z-index: 0;
+}
+
+/* ─── TIME COLUMN ────────────────────────────────────────────── */
+.timeline-time {
+  width: 42px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding-top: 4px;
+  padding-right: var(--space-3);
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-time-text {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* ─── TIMELINE CONNECTOR ─────────────────────────────────────── */
+.timeline-connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  margin-right: var(--space-3);
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  border: 2px solid var(--surface);
+  margin-top: 7px;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.timeline-item.aktif .timeline-dot {
+  background: var(--primary);
+  box-shadow: 0 0 0 4px rgba(108, 60, 225, 0.2);
+  width: 12px;
+  height: 12px;
+}
+
+.timeline-item.selesai .timeline-dot {
+  background: var(--success);
+  border-color: var(--surface);
+}
+
+/* ─── JADWAL CARD ────────────────────────────────────────────── */
+.jadwal-card-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.jadwal-card-swipe-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--danger);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--space-5);
+  z-index: 0;
+}
+
+.jadwal-card-swipe-bg span {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.jadwal-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity var(--transition-base),
+              border-color var(--transition-fast),
+              box-shadow var(--transition-fast);
+  position: relative;
+  z-index: 1;
+  touch-action: pan-y;
+}
+
+.timeline-item.aktif .jadwal-card {
+  border-color: var(--primary);
+  border-width: 2px;
+  box-shadow: 0 2px 16px rgba(108, 60, 225, 0.18);
+}
+
+.timeline-item.selesai .jadwal-card {
+  opacity: 0.6;
+  background: var(--surface-2);
+}
+
+.jadwal-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.jadwal-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.jadwal-card-judul {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+  line-height: 1.3;
+  transition: all var(--transition-fast);
+}
+
+.timeline-item.selesai .jadwal-card-judul {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.jadwal-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 4px;
+}
+
+.jadwal-card-lokasi {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.jadwal-card-lokasi svg {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.jadwal-card-range {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.jadwal-card-range svg {
+  flex-shrink: 0;
+}
+
+.jadwal-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.jadwal-hapus-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transition: all var(--transition-fast);
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+.jadwal-card:hover .jadwal-hapus-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.jadwal-hapus-btn:hover {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+/* ─── AKTIF INDICATOR ────────────────────────────────────────── */
+.aktif-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.625rem;
+  font-weight: 700;
+  background: rgba(108, 60, 225, 0.12);
+  color: var(--primary);
+  animation: pulse-aktif 2s infinite;
+  letter-spacing: 0.04em;
+}
+
+.aktif-indicator {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  animation: blink-dot 1.2s infinite;
+}
+
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes pulse-aktif {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108,60,225,0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(108,60,225,0); }
+}
+
+/* ─── TIPS CARD ──────────────────────────────────────────────── */
+.tips-card {
+  margin: var(--space-5) var(--space-5) 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--primary-lighter);
+  border: 1px solid var(--primary-light);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.tips-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.tips-content {
+  flex: 1;
+}
+
+.tips-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+
+.tips-text {
+  font-size: var(--text-sm);
+  color: var(--text);
+  line-height: 1.5;
+  font-weight: 500;
+  transition: opacity 0.4s ease;
+}
+
+.tips-text.fade-out {
+  opacity: 0;
+}
+
+.tips-text.fade-in {
+  opacity: 1;
+}
+
+/* ─── EMPTY STATE JADWAL ─────────────────────────────────────── */
+.jadwal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-8);
+  text-align: center;
+}
+
+.jadwal-empty-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: var(--primary-lighter);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-size: 2rem;
+}
+
+.jadwal-empty h3 {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.jadwal-empty p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  max-width: 200px;
+  line-height: 1.5;
+}
+
+/* ─── FORM MODAL ─────────────────────────────────────────────── */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ─── TANGGAL BADGE ──────────────────────────────────────────── */
+.tanggal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 4px 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  margin: var(--space-3) var(--space-5) 0;
+}
+
+/* ─── CHECKBOX ANIMATION ─────────────────────────────────────── */
+.checkbox-custom .check-icon {
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.checkbox-custom.checked .check-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ─── STAGGER ANIMATION ──────────────────────────────────────── */
+.timeline-item {
+  animation: fadeIn 0.3s ease both;
+}
+
+.timeline-item:nth-child(1) { animation-delay: 0ms; }
+.timeline-item:nth-child(2) { animation-delay: 50ms; }
+.timeline-item:nth-child(3) { animation-delay: 100ms; }
+.timeline-item:nth-child(4) { animation-delay: 150ms; }
+.timeline-item:nth-child(5) { animation-delay: 200ms; }
+.timeline-item:nth-child(6) { animation-delay: 250ms; }
+.timeline-item:nth-child(7) { animation-delay: 300ms; }
+.timeline-item:nth-child(n+8) { animation-delay: 350ms; }
+
+/* ─── PULL-TO-REFRESH ───────────────────────────────────────── */
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+  color: var(--primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  will-change: transform, opacity;
+}
+
+.ptr-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ptrSpin 0.8s linear infinite;
+}
+
+@keyframes ptrSpin {
+  to { transform: rotate(360deg); }
+}
+
+[data-theme="dark"] .ptr-indicator {
+  color: var(--primary);
+}

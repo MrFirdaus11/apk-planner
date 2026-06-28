@@ -1,0 +1,663 @@
+/* ============================================================
+   MANIFESTASI PAGE - APK PLANNER
+   ============================================================ */
+
+/* ─── PAGE WRAPPER ──────────────────────────────────────────── */
+.manifestasi-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding-bottom: var(--space-8);
+}
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+.manifestasi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-5) 0;
+}
+
+.manifestasi-header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.manifestasi-app-title {
+  font-size: var(--text-base);
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+.manifestasi-date-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.manifestasi-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--primary-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--white);
+  border: 2px solid var(--primary-light);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.manifestasi-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ─── STREAK BANNER ──────────────────────────────────────────── */
+.manifestasi-streak-banner {
+  margin: var(--space-4) var(--space-5) 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--primary-lighter);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--primary-light);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.streak-fire {
+  font-size: 1.375rem;
+  line-height: 1;
+  animation: fireFlicker 2s ease-in-out infinite;
+}
+
+@keyframes fireFlicker {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50%       { transform: scale(1.08) rotate(3deg); }
+}
+
+.streak-info {
+  flex: 1;
+}
+
+.streak-info strong {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--primary-dark);
+  display: block;
+}
+
+.streak-info span {
+  font-size: var(--text-xs);
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+/* ─── TOGGLE PAGI/MALAM ──────────────────────────────────────── */
+.manifestasi-toggle-wrap {
+  padding: var(--space-5) var(--space-5) 0;
+}
+
+.manifestasi-toggle-wrap .pill-toggle {
+  width: 100%;
+}
+
+.manifestasi-toggle-wrap .pill-toggle-btn {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  gap: var(--space-2);
+}
+
+.toggle-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* ─── SECTION JUDUL ──────────────────────────────────────────── */
+.manifestasi-section-head {
+  padding: var(--space-5) var(--space-5) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.manifestasi-section-title {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.manifestasi-section-subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ─── KARTU AFIRMASI ─────────────────────────────────────────── */
+.afirmasi-card-wrap {
+  padding: var(--space-4) var(--space-5) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.afirmasi-card-slider {
+  overflow: hidden;
+  border-radius: var(--radius-2xl);
+}
+
+.afirmasi-card {
+  position: relative;
+  background: linear-gradient(135deg, #F0ECFF 0%, #E8E0FF 40%, #DDD4F9 100%);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-6);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 8px 32px rgba(108, 60, 225, 0.18),
+    0 2px 8px rgba(108, 60, 225, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(108, 60, 225, 0.15);
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+  transition: transform 0.15s ease;
+}
+
+.afirmasi-card:active {
+  cursor: grabbing;
+  transform: scale(0.99);
+}
+
+.afirmasi-quote-mark {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-5);
+  font-size: 4rem;
+  line-height: 0.8;
+  color: var(--primary);
+  opacity: 0.18;
+  font-family: Georgia, serif;
+  font-weight: 900;
+  pointer-events: none;
+  user-select: none;
+}
+
+.afirmasi-quote-mark-close {
+  top: auto;
+  left: auto;
+  bottom: var(--space-3);
+  right: var(--space-5);
+  opacity: 0.12;
+}
+
+.afirmasi-card-decoration {
+  position: absolute;
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+.afirmasi-deco-1 {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(155, 95, 240, 0.2) 0%, transparent 70%);
+  top: -20px;
+  right: -20px;
+}
+
+.afirmasi-deco-2 {
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(108, 60, 225, 0.15) 0%, transparent 70%);
+  bottom: 10px;
+  left: 10px;
+}
+
+.afirmasi-card-teks {
+  font-size: 1.3125rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  text-align: center;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+  padding: 0 var(--space-3);
+}
+
+/* ─── ANIMASI SLIDE ──────────────────────────────────────────── */
+.afirmasi-card.slide-out-left {
+  animation: slideOutLeft 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.afirmasi-card.slide-out-right {
+  animation: slideOutRight 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.afirmasi-card.slide-in-left {
+  animation: slideInLeft 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.afirmasi-card.slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes slideOutLeft {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(-110%); opacity: 0; }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to   { transform: translateX(110%); opacity: 0; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(-110%); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ─── SWIPE HINT ─────────────────────────────────────────────── */
+.afirmasi-swipe-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: 0 var(--space-5);
+}
+
+.afirmasi-swipe-hint span {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
+/* ─── PAGE INDICATOR ─────────────────────────────────────────── */
+.afirmasi-page-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: 0 var(--space-5);
+}
+
+.indicator-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  transition: all var(--transition-base);
+}
+
+.indicator-dot.active {
+  width: 18px;
+  background: var(--primary);
+}
+
+.indicator-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: center;
+}
+
+/* ─── TRACKER PENGULANGAN ────────────────────────────────────── */
+.tracker-section {
+  margin: var(--space-5) var(--space-5) 0;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.tracker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.tracker-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.tracker-count-badge {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--primary);
+  background: var(--primary-lighter);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.tracker-dots {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  align-items: center;
+}
+
+.tracker-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: 2.5px solid var(--border);
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tracker-dot:hover {
+  border-color: var(--primary);
+  background: var(--primary-lighter);
+  transform: scale(1.05);
+}
+
+.tracker-dot.filled {
+  background: var(--primary-gradient);
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(108, 60, 225, 0.35);
+  transform: scale(1.05);
+  color: var(--white);
+}
+
+.tracker-dot.filled:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(108, 60, 225, 0.45);
+}
+
+.tracker-dot:active {
+  transform: scale(0.94);
+}
+
+.tracker-dot.pop {
+  animation: dotPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes dotPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1.05); }
+}
+
+/* ─── CELEBRATION OVERLAY ────────────────────────────────────── */
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(2px);
+  animation: backdropIn 0.3s ease forwards;
+}
+
+.celebration-card {
+  background: var(--surface);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8) var(--space-10);
+  text-align: center;
+  box-shadow: var(--shadow-xl);
+  border: 2px solid var(--primary-light);
+  animation: celebrateIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  pointer-events: all;
+  max-width: 280px;
+}
+
+@keyframes celebrateIn {
+  from { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.celebration-emoji {
+  font-size: 3.5rem;
+  display: block;
+  margin-bottom: var(--space-3);
+  animation: emojiDance 0.6s ease infinite alternate;
+}
+
+@keyframes emojiDance {
+  from { transform: rotate(-8deg) scale(1); }
+  to   { transform: rotate(8deg) scale(1.1); }
+}
+
+.celebration-title {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: var(--space-1);
+}
+
+.celebration-sub {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+/* Konfeti partikel */
+.confetti-particle {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 501;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ─── TOMBOL AKSI ─────────────────────────────────────────────── */
+.manifestasi-actions {
+  padding: var(--space-5) var(--space-5) 0;
+  display: flex;
+  gap: var(--space-3);
+}
+
+.btn-next-afirmasi {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  background: var(--primary-gradient);
+  color: var(--white);
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  box-shadow: 0 4px 16px rgba(108, 60, 225, 0.35);
+  transition: all var(--transition-base);
+  letter-spacing: 0.01em;
+}
+
+.btn-next-afirmasi:hover {
+  box-shadow: 0 6px 20px rgba(108, 60, 225, 0.45);
+  filter: brightness(1.05);
+}
+
+.btn-next-afirmasi:active {
+  transform: scale(0.97);
+}
+
+.btn-add-afirmasi {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-full);
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  border: 1.5px solid var(--border);
+  flex-shrink: 0;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.btn-add-afirmasi:hover {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+  transform: rotate(90deg) scale(1.05);
+}
+
+.btn-add-afirmasi:active {
+  transform: scale(0.94);
+}
+
+/* ─── INFO SECTION ────────────────────────────────────────────── */
+.manifestasi-info-section {
+  margin: var(--space-5) var(--space-5) 0;
+  padding: var(--space-4);
+  background: var(--surface-2);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.manifestasi-info-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.manifestasi-info-text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.manifestasi-info-text strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* ─── MODAL AFIRMASI KUSTOM ──────────────────────────────────── */
+.modal-afirmasi-tipe {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.modal-tipe-btn {
+  flex: 1;
+  padding: 0.625rem;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.modal-tipe-btn.active {
+  border-color: var(--primary);
+  background: var(--primary-lighter);
+  color: var(--primary);
+}
+
+.modal-tipe-btn:hover:not(.active) {
+  border-color: var(--primary-light);
+  background: var(--primary-lighter);
+}
+
+.modal-char-count {
+  text-align: right;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
+}
+
+.modal-char-count.warn   { color: var(--warning); }
+.modal-char-count.danger { color: var(--danger); }
+
+/* ─── RESPONSIVE ADJUSTMENT ──────────────────────────────────── */
+@media (max-height: 700px) {
+  .afirmasi-card {
+    min-height: 180px;
+    padding: var(--space-6) var(--space-6);
+  }
+
+  .afirmasi-card-teks {
+    font-size: 1.125rem;
+  }
+
+  .tracker-dot {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* ─── DARK MODE ───────────────────────────────────────────────── */
+[data-theme="dark"] .afirmasi-card {
+  background: linear-gradient(135deg, #1F1448 0%, #2D1F5E 40%, #1A1A2E 100%);
+  box-shadow:
+    0 8px 32px rgba(155, 95, 240, 0.15),
+    0 2px 8px rgba(0,0,0,0.2);
+}
+
+[data-theme="dark"] .manifestasi-streak-banner {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .manifestasi-section-subtitle {
+  color: var(--text-tertiary);
+}
+
+[data-theme="dark"] .manifestasi-info-section {
+  background: var(--surface);
+  border-color: var(--border);
+}
