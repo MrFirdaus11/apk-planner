@@ -64,6 +64,7 @@ function renderPage() {
         ${renderFotoCard()}
       </div>
       <input type="file" id="fotoInput" accept="image/*" multiple style="display:none">
+      <input type="file" id="kameraInput" accept="image/*" capture="environment" style="display:none">
     </div>
   `;
 }
@@ -203,6 +204,10 @@ function renderFotoCard() {
           <span class="jurnal-photo-add-icon">🖼️</span>
           <span class="jurnal-photo-add-label">Tambah Foto</span>
         </div>
+        <div class="jurnal-photo-add" id="btnBukaKamera" role="button" tabindex="0" aria-label="Buka kamera">
+          <span class="jurnal-photo-add-icon">📷</span>
+          <span class="jurnal-photo-add-label">Kamera</span>
+        </div>
       </div>
     </div>
   `;
@@ -301,6 +306,20 @@ function bindEvents(container) {
   });
 
   container.querySelector('#fotoInput')?.addEventListener('change', e => {
+    handleFotoUpload(e.target.files, container);
+    e.target.value = '';
+  });
+
+  // Foto — kamera
+  container.querySelector('#btnBukaKamera')?.addEventListener('click', () => {
+    container.querySelector('#kameraInput')?.click();
+  });
+
+  container.querySelector('#btnBukaKamera')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') container.querySelector('#kameraInput')?.click();
+  });
+
+  container.querySelector('#kameraInput')?.addEventListener('change', e => {
     handleFotoUpload(e.target.files, container);
     e.target.value = '';
   });
@@ -465,6 +484,10 @@ function rerenderFoto(container) {
       <span class="jurnal-photo-add-icon">🖼️</span>
       <span class="jurnal-photo-add-label">Tambah Foto</span>
     </div>
+    <div class="jurnal-photo-add" id="btnBukaKamera" role="button" tabindex="0" aria-label="Buka kamera">
+      <span class="jurnal-photo-add-icon">📷</span>
+      <span class="jurnal-photo-add-label">Kamera</span>
+    </div>
   `;
 
   container.querySelector('#btnTambahFoto')?.addEventListener('click', () => {
@@ -473,6 +496,14 @@ function rerenderFoto(container) {
 
   container.querySelector('#btnTambahFoto')?.addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') container.querySelector('#fotoInput')?.click();
+  });
+
+  container.querySelector('#btnBukaKamera')?.addEventListener('click', () => {
+    container.querySelector('#kameraInput')?.click();
+  });
+
+  container.querySelector('#btnBukaKamera')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') container.querySelector('#kameraInput')?.click();
   });
 }
 

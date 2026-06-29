@@ -2,7 +2,7 @@ import { getWaktuBerikutnya, selisihMsKewaktu, formatTanggalPendek } from './uti
 import { JAM_REMINDER_MALAM, PESAN_REMINDER } from './utils/constants.js';
 import { getJadwalByTanggal } from './store.js';
 
-let scheduledTimeouts = new Map();
+let scheduledTimeouts = new Map(); // id → { timeoutId, timestamp }
 
 // ─── PERMISSION ──────────────────────────────────────────────────────────────
 export async function mintaIzinNotifikasi() {
@@ -42,6 +42,17 @@ export function kirimNotifikasi(judul, opsi = {}) {
   }
 }
 
+// ─── CEK APAKAH SUDAH DINOTIFIKASI ────────────────────────────────────────────
+function sudahDinotifikasi(id) {
+  try {
+    return localStorage.getItem(`notif_${id}`) === formatTanggalPendek();
+  } catch { return false; }
+}
+
+function tandaiDinotifikasi(id) {
+  try { localStorage.setItem(`notif_${id}`, formatTanggalPendek()); } catch {}
+}
+
 // ─── JADWALKAN NOTIFIKASI JADWAL ──────────────────────────────────────────────
 export function jadwalkanNotifikasiJadwal(jadwal) {
   if (!jadwal.id || !jadwal.waktuMulai || !jadwal.tanggal) return;
@@ -50,7 +61,18 @@ export function jadwalkanNotifikasiJadwal(jadwal) {
   batalkanNotifikasiJadwal(jadwal.id);
 
   const selisihMs = selisihMsKewaktu(jadwal.waktuMulai, jadwal.tanggal);
-  if (selisihMs <= 0) return; // Sudah lewat
+
+  // Notifikasi terlewat — tampilkan segera
+  if (selisihMs <= 0 && !sudahDinotifikasi(jadwal.id)) {
+    tandaiDinotifikasi(jadwal.id);
+    kirimNotifikasi(`⏰ ${jadwal.judul}`, {
+      body: `${jadwal.waktuMulai} - ${jadwal.waktuSelesai} • ${jadwal.kategori ? jadwal.kategori.charAt(0).toUpperCase() + jadwal.kategori.slice(1) : ''}${jadwal.lokasi ? '\n📍 ' + jadwal.lokasi : ''}`,
+      tag: `jadwal-${jadwal.id}`,
+    });
+    return;
+  }
+
+  if (selisihMs <= 0) return;
 
   const timeoutId = setTimeout(() => {
     kirimNotifikasi(`⏰ ${jadwal.judul}`, {
@@ -60,7 +82,7 @@ export function jadwalkanNotifikasiJadwal(jadwal) {
     scheduledTimeouts.delete(jadwal.id);
   }, selisihMs);
 
-  scheduledTimeouts.set(jadwal.id, timeoutId);
+  scheduledTimeouts.set(jadwal.id, { timeoutId, timestamp: Date.now() + selisihMs });
 
   // Juga kirim ke service worker untuk background
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
@@ -76,7 +98,7 @@ export function jadwalkanNotifikasiJadwal(jadwal) {
 
 export function batalkanNotifikasiJadwal(id) {
   if (scheduledTimeouts.has(id)) {
-    clearTimeout(scheduledTimeouts.get(id));
+    clearTimeout(scheduledTimeouts.get(id).timeoutId);
     scheduledTimeouts.delete(id);
   }
 }
@@ -121,6 +143,24 @@ export function jadwalkanReminderHarian() {
   }
 }
 
+// ─── KIRIM NOTIFIKASI DEKAT KE SW SAAT APP DITUTUP ──────────────────────────
+function kirimNearFutureKeSW() {
+  if (!('serviceWorker' in navigator && navigator.serviceWorker.controller)) return;
+  const now = Date.now();
+  for (const [id, { timestamp }] of scheduledTimeouts) {
+    const remaining = timestamp - now;
+    if (remaining > 0 && remaining < 5 * 60 * 1000) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_NOTIFICATION',
+        id,
+        title: '',
+        body: '',
+        timestamp,
+      });
+    }
+  }
+}
+
 // ─── INISIALISASI ─────────────────────────────────────────────────────────────
 export async function initNotifikasi() {
   const granted = await mintaIzinNotifikasi();
@@ -128,5 +168,13 @@ export async function initNotifikasi() {
 
   await rescheduleSemuaJadwal();
   jadwalkanReminderHarian();
+
+  // Saat app disembunyikan/minimized, kirim near-future notif ke SW
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      kirimNearFutureKeSW();
+    }
+  });
+
   return true;
 }

@@ -74,15 +74,9 @@ import { ExpirationPlugin } from 'workbox-expiration';
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
-// ─── DETECTION ───────────────────────────────────────────────────────────
-const hasTriggerSupport = typeof TimestampTrigger !== 'undefined';
-
 // ─── RESTORE PENDING NOTIFICATIONS ────────────────────────────────────────
 async function restoreScheduledNotifications() {
   try {
-    // Skip restore if triggers are supported — browser manages them natively
-    if (hasTriggerSupport) return;
-
     const items = await dbGetAll('scheduled');
     for (const item of items) {
       const delay = item.timestamp - Date.now();
@@ -104,25 +98,6 @@ async function restoreScheduledNotifications() {
 }
 
 function scheduleSWNotification(id, title, body, delay) {
-  const timestamp = Date.now() + delay;
-
-  // Use Notification Triggers API (Chrome Android 80+) for reliable background delivery
-  if (hasTriggerSupport) {
-    try {
-      self.registration.showNotification(title, {
-        body,
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-192.png',
-        tag: `jadwal-${id}`,
-        showTrigger: new TimestampTrigger(timestamp),
-      });
-      // Browser handles scheduling natively — remove from DB to avoid duplicates on restore
-      dbDelete('scheduled', id).catch(() => {});
-      return;
-    } catch (_) {}
-  }
-
-  // Fallback: setTimeout
   const timerId = setTimeout(async () => {
     try {
       await self.registration.showNotification(title, {
@@ -188,11 +163,25 @@ async function handleScheduleNotification(data) {
   const delay = data.timestamp - Date.now();
   if (delay <= 0) return;
 
+  // Jika title/body kosong (dari visibilitychange), ambil dari DB yang sudah ada
+  let title = data.title;
+  let body = data.body;
+  if (!title && !body) {
+    try {
+      const items = await dbGetAll('scheduled');
+      const existing = items.find(i => i.id === data.id);
+      if (existing) {
+        title = existing.title;
+        body = existing.body;
+      }
+    } catch (_) {}
+  }
+
   // Persist to IndexedDB
   await dbPut('scheduled', {
     id: data.id,
-    title: data.title,
-    body: data.body,
+    title,
+    body,
     timestamp: data.timestamp,
   }).catch(() => {});
 
@@ -201,7 +190,12 @@ async function handleScheduleNotification(data) {
     clearTimeout(pendingTimers.get(data.id));
   }
 
-  scheduleSWNotification(data.id, data.title, data.body, delay);
+  scheduleSWNotification(data.id, title, body, delay);
+
+  // Register BackgroundSync so Chrome may wake the SW to re-check later
+  try {
+    await self.registration.sync.register('sync-notifications');
+  } catch (_) {}
 }
 
 async function handleCancelNotification(data) {
@@ -225,31 +219,18 @@ async function handleDailyReminder(data) {
   }).catch(() => {});
 
   scheduleDailyReminderSW(data.jam, data.menit, data.title, data.body);
+
+  // Register BackgroundSync so Chrome may wake the SW
+  try {
+    await self.registration.sync.register('sync-notifications');
+  } catch (_) {}
 }
 
 // ─── DAILY REMINDER ───────────────────────────────────────────────────────
 function scheduleDailyReminderSW(jam, menit, title, body) {
   if (_reminderInterval) clearInterval(_reminderInterval);
 
-  // Schedule next occurrence with Notification Triggers API for reliable background delivery
-  if (hasTriggerSupport) {
-    const target = new Date();
-    target.setHours(jam, menit, 0, 0);
-    if (target <= new Date()) target.setDate(target.getDate() + 1);
-    try {
-      self.registration.showNotification(title, {
-        body,
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-192.png',
-        requireInteraction: true,
-        tag: 'reminder-malam',
-        showTrigger: new TimestampTrigger(target.getTime()),
-      });
-    } catch (_) {}
-    return;
-  }
-
-  // Fallback: check every 30 seconds (unreliable in background but best effort)
+  // Check every 10 seconds (best effort — SW may be killed by Chrome)
   _reminderInterval = setInterval(async () => {
     const now = new Date();
     if (now.getHours() === jam && now.getMinutes() === menit) {
@@ -272,7 +253,7 @@ function scheduleDailyReminderSW(jam, menit, title, body) {
         });
       } catch (_) {}
     }
-  }, 30 * 1000);
+  }, 10 * 1000);
 }
 
 // ─── NOTIFICATION CLICK ───────────────────────────────────────────────────
@@ -336,9 +317,14 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// ─── SYNC (untuk notifikasi yang terlewat) ────────────────────────────────
+// ─── SYNC (Chrome bangunkan SW untuk re-check notifikasi) ────────────────
 self.addEventListener('sync', (event) => {
   if (event.tag === 'sync-notifications') {
-    event.waitUntil(restoreScheduledNotifications());
+    event.waitUntil(
+      restoreScheduledNotifications().then(() => {
+        // Re-register sync for next wake
+        try { self.registration.sync.register('sync-notifications'); } catch (_) {}
+      })
+    );
   }
 });
