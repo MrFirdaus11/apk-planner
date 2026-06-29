@@ -1,11 +1,13 @@
 import { get, set } from 'idb-keyval';
 
-const KEY_DATA = ['jadwal', 'jurnal', 'sesiFokus', 'afirmasi', 'streakManifestasi'];
+const KEY_DATA_LAMA = ['jadwal', 'jurnal', 'sesiFokus', 'afirmasi', 'streakManifestasi'];
+const KEY_DATA_BARU = ['olahraga', 'transaksi', 'aset'];
+const ALL_KEYS = [...KEY_DATA_LAMA, ...KEY_DATA_BARU];
 const VERSI = 1;
 
 export async function exportData() {
   const data = {};
-  for (const key of KEY_DATA) {
+  for (const key of ALL_KEYS) {
     data[key] = (await get(key)) || null;
   }
   return {
@@ -49,14 +51,14 @@ export function validasiData(data) {
   }
 
   const keysAda = Object.keys(data.data);
-  const missing = KEY_DATA.filter(k => !keysAda.includes(k));
+  const missingLama = KEY_DATA_LAMA.filter(k => !keysAda.includes(k));
 
-  if (missing.length > 0) {
-    return { valid: false, pesan: `Data tidak lengkap. Kurang: ${missing.join(', ')}` };
+  if (missingLama.length > 0) {
+    return { valid: false, pesan: `Data tidak lengkap. Kurang: ${missingLama.join(', ')}` };
   }
 
   const count = {};
-  for (const key of KEY_DATA) {
+  for (const key of ALL_KEYS) {
     const val = data.data[key];
     if (Array.isArray(val)) count[key] = val.length;
     else if (val && typeof val === 'object') count[key] = 1;
@@ -67,7 +69,7 @@ export function validasiData(data) {
 }
 
 export async function importData(data) {
-  for (const key of KEY_DATA) {
+  for (const key of ALL_KEYS) {
     await set(key, data.data[key] || []);
   }
 }

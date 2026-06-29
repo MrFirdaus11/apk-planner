@@ -28,7 +28,7 @@ function renderPage() {
       <div class="pengaturan-section">
         <h2 class="pengaturan-section-title">Backup Data</h2>
         <p class="pengaturan-section-desc">
-          Ekspor semua data (jadwal, jurnal, sesi fokus, afirmasi, streak) ke file JSON.
+          Ekspor semua data (jadwal, jurnal, sesi fokus, afirmasi, olahraga, keuangan) ke file JSON.
           Gunakan file ini untuk memulihkan data kapan saja.
         </p>
 
@@ -138,7 +138,7 @@ async function handleImport(file) {
 
     const detail = Object.entries(hasil.count)
       .map(([k, v]) => {
-        const label = { jadwal: 'Jadwal', jurnal: 'Jurnal', sesiFokus: 'Sesi Fokus', afirmasi: 'Afirmasi', streakManifestasi: 'Streak' };
+        const label = { jadwal: 'Jadwal', jurnal: 'Jurnal', sesiFokus: 'Sesi Fokus', afirmasi: 'Afirmasi', streakManifestasi: 'Streak', olahraga: 'Olahraga', transaksi: 'Transaksi', aset: 'Aset' };
         return `${label[k] || k}: ${v}`;
       })
       .join('<br>');
