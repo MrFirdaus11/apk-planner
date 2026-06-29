@@ -93,5 +93,5 @@ export const KATEGORI_BY_TIPE = {
 export const ASET_DEFAULT = [
   { id: 'aset-tunai', nama: 'Tunai', tipe: 'cash', warna: '#10B981', icon: 'wallet' },
   { id: 'aset-bank', nama: 'Bank', tipe: 'bank', warna: '#3B82F6', icon: 'building' },
-  { id: 'aset-ewallet', nama: 'E-Wallet', tipe: 'e-wallet', warna: '#8B5CF6', icon: 'smartphone' },
+  { id: 'aset-kartu', nama: 'Kartu', tipe: 'kartu', warna: '#8B5CF6', icon: 'credit-card' },
 ];
