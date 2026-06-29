@@ -7,6 +7,7 @@ const pages = {
   jurnal: () => import('./pages/jurnal.js'),
   olahraga: () => import('./pages/olahraga.js'),
   progres: () => import('./pages/progres.js'),
+  keuangan: () => import('./pages/keuangan.js'),
   pengaturan: () => import('./pages/pengaturan.js'),
 };
 

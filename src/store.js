@@ -237,3 +237,71 @@ export function generateInsight(statsMingguan) {
 
   return insights[0] || 'Mulai catat aktivitas Anda untuk mendapatkan insight personal yang lebih akurat.';
 }
+
+// ─── KEUANGAN ─────────────────────────────────────────────────────────────────
+// Transaksi
+export async function getSemuaTransaksi() {
+  return (await get('transaksi')) || [];
+}
+
+export async function simpanTransaksi(item) {
+  const semua = await getSemuaTransaksi();
+  const idx = semua.findIndex(t => t.id === item.id);
+  if (idx >= 0) semua[idx] = item;
+  else semua.push(item);
+  await set('transaksi', semua);
+  return item;
+}
+
+export async function hapusTransaksi(id) {
+  const semua = await getSemuaTransaksi();
+  await set('transaksi', semua.filter(t => t.id !== id));
+}
+
+export async function getTransaksiByBulan(tahun, bulan) {
+  const semua = await getSemuaTransaksi();
+  const prefix = `${tahun}-${String(bulan).padStart(2, '0')}`;
+  return semua
+    .filter(t => t.tanggal.startsWith(prefix))
+    .sort((a, b) => b.tanggal.localeCompare(a.tanggal) || (b.createdAt || 0) - (a.createdAt || 0));
+}
+
+export async function getTotalByTipe(tahun, bulan, tipe) {
+  const transaksi = await getTransaksiByBulan(tahun, bulan);
+  return transaksi
+    .filter(t => t.tipe === tipe)
+    .reduce((sum, t) => sum + (t.jumlah || 0), 0);
+}
+
+export async function getRekapBulanan(tahun, bulan) {
+  const transaksi = await getTransaksiByBulan(tahun, bulan);
+  const totalPemasukan = transaksi.filter(t => t.tipe === 'pemasukan').reduce((s, t) => s + t.jumlah, 0);
+  const totalPengeluaran = transaksi.filter(t => t.tipe === 'pengeluaran').reduce((s, t) => s + t.jumlah, 0);
+  return { totalPemasukan, totalPengeluaran, selisih: totalPemasukan - totalPengeluaran };
+}
+
+// Aset
+export async function getSemuaAset() {
+  return (await get('aset')) || [];
+}
+
+export async function simpanAset(item) {
+  const semua = await getSemuaAset();
+  const idx = semua.findIndex(a => a.id === item.id);
+  if (idx >= 0) semua[idx] = item;
+  else semua.push(item);
+  await set('aset', semua);
+  return item;
+}
+
+export async function hapusAset(id) {
+  const semua = await getSemuaAset();
+  await set('aset', semua.filter(a => a.id !== id));
+}
+
+export async function initAsetDefault() {
+  const semua = await getSemuaAset();
+  if (semua.length > 0) return;
+  const { ASET_DEFAULT } = await import('./utils/constants.js');
+  await Promise.all(ASET_DEFAULT.map(a => simpanAset(a)));
+}

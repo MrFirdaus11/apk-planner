@@ -60,3 +60,38 @@ export const MOOD_LIST = [
 
 export const JAM_REMINDER_MALAM = { jam: 21, menit: 30 };
 export const PESAN_REMINDER = 'Ayoo siapkan planning untuk hari besok! 📋';
+
+// ─── KEUANGAN ─────────────────────────────────────────────────────────────────
+export const KATEGORI_KEUANGAN = {
+  // Pemasukan
+  gaji: { label: 'Gaji', color: '#10B981', bg: '#D1FAE5', icon: 'briefcase', tipe: 'pemasukan' },
+  freelance: { label: 'Freelance', color: '#3B82F6', bg: '#DBEAFE', icon: 'laptop', tipe: 'pemasukan' },
+  investasi: { label: 'Investasi', color: '#8B5CF6', bg: '#EDE5FF', icon: 'trending-up', tipe: 'pemasukan' },
+  hadiah: { label: 'Hadiah', color: '#F59E0B', bg: '#FEF3C7', icon: 'gift', tipe: 'pemasukan' },
+  pemasukan_lain: { label: 'Lainnya', color: '#6B7280', bg: '#F3F4F6', icon: 'plus-circle', tipe: 'pemasukan' },
+
+  // Pengeluaran
+  makanan: { label: 'Makanan', color: '#EF4444', bg: '#FEE2E2', icon: 'utensils', tipe: 'pengeluaran' },
+  transportasi: { label: 'Transportasi', color: '#F97316', bg: '#FFEDD5', icon: 'car', tipe: 'pengeluaran' },
+  belanja: { label: 'Belanja', color: '#EC4899', bg: '#FCE7F3', icon: 'shopping-bag', tipe: 'pengeluaran' },
+  tagihan: { label: 'Tagihan', color: '#6366F1', bg: '#E0E7FF', icon: 'file-text', tipe: 'pengeluaran' },
+  hiburan: { label: 'Hiburan', color: '#14B8A6', bg: '#D1FAE5', icon: 'film', tipe: 'pengeluaran' },
+  kesehatan: { label: 'Kesehatan', color: '#10B981', bg: '#D1FAE5', icon: 'heart-pulse', tipe: 'pengeluaran' },
+  pendidikan: { label: 'Pendidikan', color: '#8B5CF6', bg: '#EDE5FF', icon: 'book-open', tipe: 'pengeluaran' },
+  pengeluaran_lain: { label: 'Lainnya', color: '#6B7280', bg: '#F3F4F6', icon: 'more-horizontal', tipe: 'pengeluaran' },
+};
+
+export const KATEGORI_BY_TIPE = {
+  pemasukan: Object.fromEntries(
+    Object.entries(KATEGORI_KEUANGAN).filter(([, v]) => v.tipe === 'pemasukan')
+  ),
+  pengeluaran: Object.fromEntries(
+    Object.entries(KATEGORI_KEUANGAN).filter(([, v]) => v.tipe === 'pengeluaran')
+  ),
+};
+
+export const ASET_DEFAULT = [
+  { id: 'aset-tunai', nama: 'Tunai', tipe: 'cash', warna: '#10B981', icon: 'wallet' },
+  { id: 'aset-bank', nama: 'Bank', tipe: 'bank', warna: '#3B82F6', icon: 'building' },
+  { id: 'aset-ewallet', nama: 'E-Wallet', tipe: 'e-wallet', warna: '#8B5CF6', icon: 'smartphone' },
+];

@@ -11,6 +11,7 @@ export function renderBottomNav() {
     { id: 'jurnal', label: 'Jurnal', icon: 'scroll-text' },
     { id: 'olahraga', label: 'Olahraga', icon: 'dumbbell' },
     { id: 'progres', label: 'Progres', icon: 'bar-chart-2' },
+    { id: 'keuangan', label: 'Keuangan', icon: 'wallet' },
   ];
 
   nav.className = 'bottom-nav';
