@@ -114,6 +114,45 @@ export async function updateStreakManifestasi(tanggal) {
   return streak;
 }
 
+// ─── OLAHRAGA ─────────────────────────────────────────────────────────────────
+export async function getSemuaOlahraga() {
+  return (await get('olahraga')) || [];
+}
+
+export async function simpanOlahraga(hariLatihan) {
+  const semua = await getSemuaOlahraga();
+  const idx = semua.findIndex(o => o.id === hariLatihan.id);
+  if (idx >= 0) semua[idx] = hariLatihan;
+  else semua.push(hariLatihan);
+  await set('olahraga', semua);
+  return hariLatihan;
+}
+
+export async function getOlahragaByHari(hari) {
+  const semua = await getSemuaOlahraga();
+  return semua.find(o => o.hari === hari) || null;
+}
+
+export async function hapusOlahraga(id) {
+  const semua = await getSemuaOlahraga();
+  await set('olahraga', semua.filter(o => o.id !== id));
+}
+
+export async function initOlahragaDefault() {
+  const semua = await getSemuaOlahraga();
+  if (semua.length > 0) return;
+  const hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  const defaultData = hariList.map(hari => ({
+    id: `olahraga-${hari.toLowerCase()}`,
+    hari,
+    fokus: '',
+    lokasi: 'rumah',
+    durasi: 0,
+    latihan: [],
+  }));
+  await set('olahraga', defaultData);
+}
+
 // ─── STATISTIK ───────────────────────────────────────────────────────────────
 export async function getStatistikHarian(tanggal) {
   const tglStr = typeof tanggal === 'string' ? tanggal : formatTanggalPendek(tanggal);

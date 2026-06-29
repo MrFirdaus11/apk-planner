@@ -9,6 +9,7 @@ export function renderBottomNav() {
     { id: 'fokus', label: 'Pomodoro', icon: 'timer' },
     { id: 'manifestasi', label: 'Manifestasi', icon: 'sparkles' },
     { id: 'jurnal', label: 'Jurnal', icon: 'scroll-text' },
+    { id: 'olahraga', label: 'Olahraga', icon: 'dumbbell' },
     { id: 'progres', label: 'Progres', icon: 'bar-chart-2' },
   ];
 

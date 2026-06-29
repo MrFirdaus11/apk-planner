@@ -5,6 +5,7 @@ const pages = {
   fokus: () => import('./pages/fokus.js'),
   manifestasi: () => import('./pages/manifestasi.js'),
   jurnal: () => import('./pages/jurnal.js'),
+  olahraga: () => import('./pages/olahraga.js'),
   progres: () => import('./pages/progres.js'),
   pengaturan: () => import('./pages/pengaturan.js'),
 };
