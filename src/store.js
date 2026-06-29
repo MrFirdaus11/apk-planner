@@ -301,7 +301,16 @@ export async function hapusAset(id) {
 
 export async function initAsetDefault() {
   const semua = await getSemuaAset();
-  if (semua.length > 0) return;
   const { ASET_DEFAULT } = await import('./utils/constants.js');
-  await Promise.all(ASET_DEFAULT.map(a => simpanAset(a)));
+  for (const def of ASET_DEFAULT) {
+    const existing = semua.find(a => a.id === def.id);
+    if (existing) {
+      // Update jika ada perubahan (nama, icon, etc)
+      if (existing.nama !== def.nama || existing.icon !== def.icon || existing.tipe !== def.tipe) {
+        await simpanAset({ ...existing, ...def });
+      }
+    } else {
+      await simpanAset(def);
+    }
+  }
 }
