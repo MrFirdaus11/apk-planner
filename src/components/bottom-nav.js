@@ -6,11 +6,11 @@ export function renderBottomNav() {
 
   const items = [
     { id: 'jadwal', label: 'Jadwal', icon: 'calendar-days' },
-    { id: 'fokus', label: 'Pomodoro', icon: 'timer' },
     { id: 'manifestasi', label: 'Manifestasi', icon: 'sparkles' },
     { id: 'jurnal', label: 'Jurnal', icon: 'scroll-text' },
     { id: 'olahraga', label: 'Olahraga', icon: 'dumbbell' },
     { id: 'progres', label: 'Progres', icon: 'bar-chart-2' },
+    { id: 'fokus', label: 'Pomodoro', icon: 'timer' },
     { id: 'keuangan', label: 'Keuangan', icon: 'wallet' },
   ];
 
