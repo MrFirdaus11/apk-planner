@@ -65,9 +65,24 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Workbox precache manifest injection (required by vite-plugin-pwa injectManifest)
+import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
+import { registerRoute, NavigationRoute } from 'workbox-routing';
+import { CacheFirst } from 'workbox-strategies';
+import { ExpirationPlugin } from 'workbox-expiration';
+
+precacheAndRoute(self.__WB_MANIFEST);
+cleanupOutdatedCaches();
+
+// ─── DETECTION ───────────────────────────────────────────────────────────
+const hasTriggerSupport = typeof TimestampTrigger !== 'undefined';
+
 // ─── RESTORE PENDING NOTIFICATIONS ────────────────────────────────────────
 async function restoreScheduledNotifications() {
   try {
+    // Skip restore if triggers are supported — browser manages them natively
+    if (hasTriggerSupport) return;
+
     const items = await dbGetAll('scheduled');
     for (const item of items) {
       const delay = item.timestamp - Date.now();
@@ -89,6 +104,25 @@ async function restoreScheduledNotifications() {
 }
 
 function scheduleSWNotification(id, title, body, delay) {
+  const timestamp = Date.now() + delay;
+
+  // Use Notification Triggers API (Chrome Android 80+) for reliable background delivery
+  if (hasTriggerSupport) {
+    try {
+      self.registration.showNotification(title, {
+        body,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
+        tag: `jadwal-${id}`,
+        showTrigger: new TimestampTrigger(timestamp),
+      });
+      // Browser handles scheduling natively — remove from DB to avoid duplicates on restore
+      dbDelete('scheduled', id).catch(() => {});
+      return;
+    } catch (_) {}
+  }
+
+  // Fallback: setTimeout
   const timerId = setTimeout(async () => {
     try {
       await self.registration.showNotification(title, {
@@ -107,15 +141,20 @@ function scheduleSWNotification(id, title, body, delay) {
 
 // ─── FETCH ────────────────────────────────────────────────────────────────
 self.addEventListener('fetch', (event) => {
-  if (event.request.mode === 'navigate') {
+  // Wrap in try-catch to avoid conflict with Workbox's handlers (injectManifest)
+  try {
+    if (event.request.mode === 'navigate') {
+      event.respondWith(
+        fetch(event.request).catch(() => caches.match('/'))
+      );
+      return;
+    }
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/'))
+      caches.match(event.request).then(cached => cached || fetch(event.request))
     );
-    return;
+  } catch (_) {
+    // Already handled by Workbox — ignore
   }
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
-  );
 });
 
 // ─── MESSAGE FROM APP ─────────────────────────────────────────────────────
@@ -171,6 +210,8 @@ async function handleCancelNotification(data) {
     pendingTimers.delete(data.id);
   }
   await dbDelete('scheduled', data.id).catch(() => {});
+  // Track cancelled IDs so notificationclick can ignore stale showTrigger notifications
+  await dbPut('meta', { key: `cancelled-${data.id}`, cancelled: true }).catch(() => {});
 }
 
 async function handleDailyReminder(data) {
@@ -189,11 +230,29 @@ async function handleDailyReminder(data) {
 // ─── DAILY REMINDER ───────────────────────────────────────────────────────
 function scheduleDailyReminderSW(jam, menit, title, body) {
   if (_reminderInterval) clearInterval(_reminderInterval);
-  // Check every 30 seconds
+
+  // Schedule next occurrence with Notification Triggers API for reliable background delivery
+  if (hasTriggerSupport) {
+    const target = new Date();
+    target.setHours(jam, menit, 0, 0);
+    if (target <= new Date()) target.setDate(target.getDate() + 1);
+    try {
+      self.registration.showNotification(title, {
+        body,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
+        requireInteraction: true,
+        tag: 'reminder-malam',
+        showTrigger: new TimestampTrigger(target.getTime()),
+      });
+    } catch (_) {}
+    return;
+  }
+
+  // Fallback: check every 30 seconds (unreliable in background but best effort)
   _reminderInterval = setInterval(async () => {
     const now = new Date();
     if (now.getHours() === jam && now.getMinutes() === menit) {
-      // Cek apakah sudah pernah ditampilkan hari ini
       try {
         const metas = await dbGetAll('meta');
         const shown = metas.find(m => m.key === 'reminder-shown');
@@ -219,6 +278,52 @@ function scheduleDailyReminderSW(jam, menit, title, body) {
 // ─── NOTIFICATION CLICK ───────────────────────────────────────────────────
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  const tag = event.notification.tag || '';
+
+  // Skip cancelled notifications (from showTrigger that can't be unscheduled)
+  if (tag.startsWith('jadwal-')) {
+    const id = tag.replace('jadwal-', '');
+    event.waitUntil(
+      dbGetAll('meta').then(metas => {
+        const cancelled = metas.find(m => m.key === `cancelled-${id}`);
+        if (cancelled) {
+          dbDelete('meta', `cancelled-${id}`).catch(() => {});
+          return; // Ignore click on stale notification
+        }
+        return clients.matchAll({ type: 'window' }).then(clientList => {
+          if (clientList.length > 0) {
+            clientList[0].focus();
+            clientList[0].navigate('/#jadwal').catch(() => {});
+          } else {
+            clients.openWindow('/#jadwal').catch(() => {});
+          }
+        });
+      })
+    );
+    return;
+  }
+
+  // Daily reminder — re-schedule next occurrence after clicking
+  if (tag === 'reminder-malam') {
+    event.waitUntil(
+      dbGetAll('meta').then(metas => {
+        const reminder = metas.find(m => m.key === 'reminder');
+        if (reminder) {
+          scheduleDailyReminderSW(reminder.jam, reminder.menit, reminder.title, reminder.body);
+        }
+        return clients.matchAll({ type: 'window' }).then(clientList => {
+          if (clientList.length > 0) {
+            clientList[0].focus();
+            clientList[0].navigate('/#jadwal').catch(() => {});
+          } else {
+            clients.openWindow('/#jadwal').catch(() => {});
+          }
+        });
+      })
+    );
+    return;
+  }
+
   event.waitUntil(
     clients.matchAll({ type: 'window' }).then(clientList => {
       if (clientList.length > 0) {

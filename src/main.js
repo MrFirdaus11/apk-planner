@@ -20,16 +20,6 @@ async function init() {
 
   // Init notifikasi (minta izin & schedule)
   await initNotifikasi();
-
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker terdaftar:', reg.scope);
-    } catch (e) {
-      console.warn('Service Worker gagal:', e);
-    }
-  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
