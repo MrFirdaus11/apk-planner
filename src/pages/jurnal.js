@@ -210,8 +210,10 @@ function renderFotoCard() {
 
 // ─── BIND EVENTS ──────────────────────────────────────────────
 function bindEvents(container) {
-  // Tombol kembali — tidak melakukan apapun
-  container.querySelector('#btnKembali')?.addEventListener('click', () => {});
+  // Tombol kembali — navigasi ke halaman jadwal
+  container.querySelector('#btnKembali')?.addEventListener('click', () => {
+    window.location.hash = '#jadwal';
+  });
 
   // Tombol simpan manual
   container.querySelector('#btnSimpan')?.addEventListener('click', () => simpanManual());

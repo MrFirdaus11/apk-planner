@@ -35,6 +35,7 @@ let jadwalList = [];
 let tipsInterval = null;
 let tipsIndex = 0;
 let _container = null;
+let _editingId = null;
 
 // ─── SWIPE STATE ─────────────────────────────────────────────────────────────
 let _swipeState = null;
@@ -136,15 +137,7 @@ function renderHeader() {
         <span class="jadwal-tanggal-label">Hari ini</span>
         <span class="jadwal-tanggal-value">${namaHari}, ${tgl} ${namaBulan} ${tahun}</span>
       </div>
-      <div class="flex gap-2">
-        <button class="btn btn-icon" id="btn-search-jadwal" title="Cari jadwal" aria-label="Cari jadwal">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </button>
-      </div>
+      <div style="width:40px"></div>
     </div>
   `;
 }
@@ -499,9 +492,11 @@ async function refreshTimeline() {
   }
 }
 
-// ─── MODAL TAMBAH JADWAL ──────────────────────────────────────────────────────
-function bukaModalTambahJadwal(tglDefault = null) {
+// ─── MODAL TAMBAH / EDIT JADWAL ───────────────────────────────────────────────
+function bukaModalTambahJadwal(tglDefault = null, existing = null) {
+  _editingId = existing ? existing.id : null;
   const tglValue = tglDefault || formatTanggalPendek(tanggalAktif);
+  const isEdit = !!existing;
 
   const formEl = document.createElement('div');
   formEl.className = 'modal-form';
@@ -515,28 +510,29 @@ function bukaModalTambahJadwal(tglDefault = null) {
         placeholder="Contoh: Meeting tim pagi"
         maxlength="80"
         autocomplete="off"
+        value="${existing ? escapeHtml(existing.judul) : ''}"
       />
     </div>
 
     <div class="form-group">
       <label class="form-label" for="inp-kategori">Kategori</label>
       <select id="inp-kategori" class="form-input form-select">
-        <option value="kesehatan">💚 Kesehatan</option>
-        <option value="kerja" selected>💼 Kerja</option>
-        <option value="pribadi">🩷 Pribadi</option>
-        <option value="belajar">📚 Belajar</option>
-        <option value="lainnya">🔘 Lainnya</option>
+        <option value="kesehatan" ${existing?.kategori === 'kesehatan' ? 'selected' : ''}>💚 Kesehatan</option>
+        <option value="kerja" ${existing?.kategori === 'kerja' ? 'selected' : ''}>💼 Kerja</option>
+        <option value="pribadi" ${existing?.kategori === 'pribadi' ? 'selected' : ''}>🩷 Pribadi</option>
+        <option value="belajar" ${existing?.kategori === 'belajar' ? 'selected' : ''}>📚 Belajar</option>
+        <option value="lainnya" ${existing?.kategori === 'lainnya' ? 'selected' : ''}>🔘 Lainnya</option>
       </select>
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label class="form-label" for="inp-mulai">Waktu Mulai</label>
-        <input id="inp-mulai" class="form-input" type="time" />
+        <input id="inp-mulai" class="form-input" type="time" value="${existing?.waktuMulai || ''}" />
       </div>
       <div class="form-group">
         <label class="form-label" for="inp-selesai">Waktu Selesai</label>
-        <input id="inp-selesai" class="form-input" type="time" />
+        <input id="inp-selesai" class="form-input" type="time" value="${existing?.waktuSelesai || ''}" />
       </div>
     </div>
 
@@ -549,32 +545,35 @@ function bukaModalTambahJadwal(tglDefault = null) {
         placeholder="Contoh: Kantor, Kafe, Rumah…"
         maxlength="60"
         autocomplete="off"
+        value="${existing ? escapeHtml(existing.lokasi) : ''}"
       />
     </div>
 
     <div class="form-group">
       <label class="form-label" for="inp-tanggal">Tanggal</label>
-      <input id="inp-tanggal" class="form-input" type="date" value="${tglValue}" />
+      <input id="inp-tanggal" class="form-input" type="date" value="${existing ? existing.tanggal : tglValue}" />
     </div>
   `;
 
-  // Set default waktu mulai ke jam saat ini (dibulatkan ke 15 menit)
-  const now = new Date();
-  const menitBulat = Math.ceil(now.getMinutes() / 15) * 15;
-  const jamMulai = menitBulat >= 60 ? now.getHours() + 1 : now.getHours();
-  const menitMulai = menitBulat >= 60 ? 0 : menitBulat;
-  const defaultMulai = `${String(jamMulai % 24).padStart(2, '0')}:${String(menitMulai).padStart(2, '0')}`;
-  const defaultSelesai = `${String((jamMulai + 1) % 24).padStart(2, '0')}:${String(menitMulai).padStart(2, '0')}`;
+  // Set default waktu jika tidak ada nilai existing
+  if (!existing) {
+    const now = new Date();
+    const menitBulat = Math.ceil(now.getMinutes() / 15) * 15;
+    const jamMulai = menitBulat >= 60 ? now.getHours() + 1 : now.getHours();
+    const menitMulai = menitBulat >= 60 ? 0 : menitBulat;
+    const defaultMulai = `${String(jamMulai % 24).padStart(2, '0')}:${String(menitMulai).padStart(2, '0')}`;
+    const defaultSelesai = `${String((jamMulai + 1) % 24).padStart(2, '0')}:${String(menitMulai).padStart(2, '0')}`;
 
-  setTimeout(() => {
-    const mulaiEl = document.getElementById('inp-mulai');
-    const selesaiEl = document.getElementById('inp-selesai');
-    if (mulaiEl && !mulaiEl.value) mulaiEl.value = defaultMulai;
-    if (selesaiEl && !selesaiEl.value) selesaiEl.value = defaultSelesai;
-  }, 50);
+    setTimeout(() => {
+      const mulaiEl = document.getElementById('inp-mulai');
+      const selesaiEl = document.getElementById('inp-selesai');
+      if (mulaiEl && !mulaiEl.value) mulaiEl.value = defaultMulai;
+      if (selesaiEl && !selesaiEl.value) selesaiEl.value = defaultSelesai;
+    }, 50);
+  }
 
   bukaModal({
-    judul: '📅 Tambah Jadwal',
+    judul: isEdit ? '✏️ Edit Jadwal' : '📅 Tambah Jadwal',
     konten: formEl,
     ukuran: 'besar',
     aksi: [
@@ -582,7 +581,7 @@ function bukaModalTambahJadwal(tglDefault = null) {
         label: 'Batal',
         id: 'batal',
         kelas: 'btn-ghost',
-        onClick: () => tutupModal(),
+        onClick: () => { _editingId = null; tutupModal(); },
       },
       {
         label: 'Simpan',
@@ -593,13 +592,12 @@ function bukaModalTambahJadwal(tglDefault = null) {
     ],
   });
 
-  // Focus judul
   setTimeout(() => {
     document.getElementById('inp-judul')?.focus();
   }, 300);
 }
 
-// ─── SIMPAN JADWAL BARU ───────────────────────────────────────────────────────
+// ─── SIMPAN JADWAL (BARU / EDIT) ───────────────────────────────────────────────
 async function simpanJadwalBaru() {
   const judul = document.getElementById('inp-judul')?.value.trim();
   const kategori = document.getElementById('inp-kategori')?.value;
@@ -619,8 +617,14 @@ async function simpanJadwalBaru() {
     return;
   }
 
+  if (waktuMulai && waktuSelesai && parseWaktuMenit(waktuMulai) >= parseWaktuMenit(waktuSelesai)) {
+    tampilkanToast('Waktu selesai harus setelah waktu mulai!', 'error');
+    return;
+  }
+
+  const isEdit = !!_editingId;
   const jadwalBaru = {
-    id: generateId(),
+    id: _editingId || generateId(),
     judul,
     kategori: kategori || 'lainnya',
     waktuMulai: waktuMulai || '',
@@ -631,13 +635,23 @@ async function simpanJadwalBaru() {
     dibuatPada: Date.now(),
   };
 
+  // Jika edit, pertahankan status selesai dari data lama
+  if (isEdit) {
+    const existing = jadwalList.find(j => j.id === _editingId);
+    if (existing) {
+      jadwalBaru.selesai = existing.selesai;
+      jadwalBaru.dibuatPada = existing.dibuatPada;
+    }
+  }
+
   try {
     await simpanJadwal(jadwalBaru);
-    jadwalkanNotifikasiJadwal(jadwalBaru);
+    if (!isEdit) jadwalkanNotifikasiJadwal(jadwalBaru);
+    else if (jadwalBaru.selesai) batalkanNotifikasiJadwal(jadwalBaru.id);
     tutupModal();
-    tampilkanToast('Jadwal berhasil ditambahkan! 🎉', 'success');
+    _editingId = null;
+    tampilkanToast(isEdit ? 'Jadwal diperbarui! ✏️' : 'Jadwal berhasil ditambahkan! 🎉', 'success');
 
-    // Refresh
     if (isSameDay(new Date(jadwalBaru.tanggal), tanggalAktif)) {
       await refreshTimeline();
       await updateDatePickerDots();
@@ -770,6 +784,15 @@ function setupTimelineListeners() {
       e.stopPropagation();
       handleHapusJadwal(el.dataset.id);
     };
+  });
+
+  // Edit — klik pada card
+  document.querySelectorAll('.jadwal-card[data-id]').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('.checkbox-custom') || e.target.closest('.jadwal-hapus-btn')) return;
+      const jadwal = jadwalList.find(j => j.id === el.dataset.id);
+      if (jadwal) bukaModalTambahJadwal(null, jadwal);
+    });
   });
 
   // Swipe to delete

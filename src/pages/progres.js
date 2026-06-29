@@ -5,7 +5,7 @@ import {
   generateInsight,
   getSemuaSesiFokus,
 } from '../store.js';
-import { formatDurasiMenit, getMingguIni, isSameDay } from '../utils/date-utils.js';
+import { formatDurasiMenit, isSameDay } from '../utils/date-utils.js';
 import { HARI_SINGKAT } from '../utils/constants.js';
 import '../styles/progres.css';
 import '../styles/components.css';
@@ -288,6 +288,31 @@ function renderLoading() {
 function renderPage() {
   if (!_container) return;
 
+  const isEmpty = _statsData.length === 0 || _statsData.every(s =>
+    !s.totalJadwal && !s.totalMenitFokus && !s.adaJurnal
+  );
+
+  if (isEmpty && _periode === 'mingguan') {
+    _container.innerHTML = /* html */ `
+      <div class="progres-page">
+        ${renderHeader()}
+        ${renderPeriodeToggle()}
+        <div class="empty-state" style="padding-top:var(--space-12)">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h3>Belum Ada Data</h3>
+          <p>Mulai gunakan fitur Jadwal, Fokus, dan Jurnal untuk melihat statistik perkembanganmu.</p>
+        </div>
+      </div>
+    `;
+    attachEventListeners();
+    return;
+  }
+
   const jumlahHari = _periode === 'mingguan' ? 7 : 30;
   const skor = hitungSkorProgres(_statsData);
   const rataJadwal = hitungRataJadwal(_statsData);
@@ -327,11 +352,11 @@ function attachEventListeners() {
     });
   });
 
-  // Lihat Detail (bisa dikembangkan nanti)
+  // Lihat Detail — navigasi ke jadwal
   const lihatDetail = _container.querySelector('.aktivitas-detail-link');
   if (lihatDetail) {
     lihatDetail.addEventListener('click', () => {
-      // placeholder — bisa navigate ke halaman jadwal
+      window.location.hash = '#jadwal';
     });
     lihatDetail.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') lihatDetail.click();

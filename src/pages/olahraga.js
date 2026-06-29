@@ -4,7 +4,7 @@ import {
   initOlahragaDefault,
 } from '../store.js';
 import { escapeHtml } from '../utils/helpers.js';
-import { bukaModal, tutupModal, updateModalBody } from '../components/modal.js';
+import { bukaModal, tutupModal } from '../components/modal.js';
 import { tampilkanToast } from '../components/toast.js';
 import '../styles/olahraga.css';
 import '../styles/components.css';
@@ -187,7 +187,7 @@ function bindEvents() {
       const data = getHariAktifData();
       if (data) {
         data.fokus = fokusInput.value.trim();
-        simpanOlahraga(data).catch(() => {});
+        simpanOlahraga(data).catch(err => { console.error(err); tampilkanToast('Gagal menyimpan data', 'error'); });
         render();
       }
     });
@@ -196,7 +196,7 @@ function bindEvents() {
       const data = getHariAktifData();
       if (data && !data.fokus && fokusInput.value.trim()) {
         data.fokus = fokusInput.value.trim();
-        simpanOlahraga(data).catch(() => {});
+        simpanOlahraga(data).catch(err => { console.error(err); tampilkanToast('Gagal menyimpan data', 'error'); });
       }
     });
   }
@@ -208,7 +208,7 @@ function bindEvents() {
       const data = getHariAktifData();
       if (data) {
         data.lokasi = data.lokasi === 'gym' ? 'rumah' : 'gym';
-        simpanOlahraga(data).catch(() => {});
+        simpanOlahraga(data).catch(err => { console.error(err); tampilkanToast('Gagal menyimpan data', 'error'); });
         render();
         tampilkanToast(`Lokasi: ${data.lokasi === 'gym' ? 'Gym' : 'Rumah'}`, 'info');
       }

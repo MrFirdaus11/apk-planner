@@ -88,7 +88,7 @@ function _renderPage() {
 function _renderHeader(tanggal) {
   return `
     <header class="manifestasi-header">
-      <div class="manifestasi-avatar" id="avatar-btn" role="button" tabindex="0" title="Profil">
+      <div class="manifestasi-avatar">
         <span>✨</span>
       </div>
       <div class="manifestasi-header-center">

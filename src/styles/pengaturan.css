@@ -10,7 +10,7 @@
 .pengaturan-header h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: var(--text);
   margin: 0 0 var(--space-1);
 }
 
@@ -27,7 +27,7 @@
 .pengaturan-section-title {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 0 var(--space-1);
@@ -45,8 +45,8 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-3);
-  background: var(--bg-secondary);
-  border-radius: var(--radius);
+  background: var(--surface-2);
+  border-radius: var(--radius-md);
   margin-bottom: var(--space-2);
 }
 
@@ -65,7 +65,7 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: var(--primary-bg);
+  background: var(--primary-light);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -84,7 +84,7 @@
 .pengaturan-card-title {
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--text);
 }
 
 .pengaturan-card-desc {

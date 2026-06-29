@@ -1,4 +1,4 @@
-import { get, set, del, keys } from 'idb-keyval';
+import { get, set } from 'idb-keyval';
 import { formatTanggalPendek } from './utils/date-utils.js';
 
 // ─── JADWAL ──────────────────────────────────────────────────────────────────

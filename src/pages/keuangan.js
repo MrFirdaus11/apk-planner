@@ -8,7 +8,7 @@ import {
   simpanAset,
   initAsetDefault,
 } from '../store.js';
-import { BULAN, KATEGORI_KEUANGAN, KATEGORI_BY_TIPE, ASET_DEFAULT } from '../utils/constants.js';
+import { BULAN, KATEGORI_KEUANGAN, KATEGORI_BY_TIPE } from '../utils/constants.js';
 import { escapeHtml } from '../utils/helpers.js';
 import { bukaModal, tutupModal } from '../components/modal.js';
 import { tampilkanToast } from '../components/toast.js';

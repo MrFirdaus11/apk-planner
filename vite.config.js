@@ -8,7 +8,7 @@ export default defineConfig({
       srcDir: 'public',
       filename: 'sw.js',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'icons/*.png'],
+      includeAssets: ['icons/*.png'],
       manifest: {
         name: 'APK Planner',
         short_name: 'APK Planner',
