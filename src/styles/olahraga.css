@@ -245,12 +245,6 @@
   opacity: 1;
 }
 
-.olahraga-exercise-drag {
-  color: var(--text-tertiary);
-  cursor: grab;
-  flex-shrink: 0;
-  opacity: 0.4;
-}
 
 .olahraga-exercise-nama {
   flex: 1;
@@ -292,6 +286,50 @@
   font-size: 10px;
   color: var(--text-tertiary);
   display: block;
+}
+
+/* ─── DRAG TO REORDER ──────────────────────────────────── */
+.olahraga-exercise-item {
+  cursor: default;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+
+.olahraga-exercise-item[draggable="true"] {
+  cursor: grab;
+}
+
+.olahraga-exercise-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+.olahraga-exercise-item.dragging {
+  opacity: 0.35;
+  transform: scale(0.97);
+  box-shadow: 0 0 0 2px var(--primary);
+  cursor: grabbing;
+}
+
+.olahraga-exercise-item.drop-before {
+  border-top: 3px solid var(--primary) !important;
+  transform: translateY(2px);
+}
+
+.olahraga-exercise-item.drop-after {
+  border-bottom: 3px solid var(--primary) !important;
+  transform: translateY(-2px);
+}
+
+.olahraga-exercise-drag {
+  color: var(--text-tertiary);
+  cursor: grab;
+  flex-shrink: 0;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  touch-action: none;
+}
+
+.olahraga-exercise-item:hover .olahraga-exercise-drag {
+  opacity: 0.8;
 }
 
 .olahraga-exercise-edit-btn {

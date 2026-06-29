@@ -141,7 +141,7 @@ function renderDayCard(hariData) {
 function renderExerciseList(latihan) {
   if (!latihan || latihan.length === 0) return '';
   return latihan.map((ex, idx) => `
-    <div class="olahraga-exercise-item" data-exercise-id="${escapeHtml(ex.id)}">
+    <div class="olahraga-exercise-item" draggable="true" data-exercise-id="${escapeHtml(ex.id)}" data-index="${idx}">
       <div class="olahraga-exercise-drag">
         <i data-lucide="grip-vertical" width="14" height="14"></i>
       </div>
@@ -241,6 +241,9 @@ function bindEvents() {
 
   // Exercise swipe to delete
   initSwipe();
+
+  // Drag to reorder
+  initDrag();
 
   // Reset button
   const resetBtn = document.getElementById('olahraga-reset-btn');
@@ -345,6 +348,109 @@ function cleanupSwipe() {
   document.removeEventListener('mousemove', docMouseMove);
   document.removeEventListener('mouseup', docMouseUp);
   _swipeState = null;
+}
+
+// ─── DRAG TO REORDER ──────────────────────────────────────
+let _dragState = null;
+
+function initDrag() {
+  const list = document.getElementById('olahraga-exercise-list');
+  if (!list) return;
+
+  let dragSourceIndex = null;
+
+  // Event delegation for performance
+  list.addEventListener('dragstart', (e) => {
+    const item = e.target.closest('.olahraga-exercise-item');
+    if (!item) return;
+    dragSourceIndex = parseInt(item.dataset.index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', item.dataset.exerciseId);
+    _dragState = { sourceIndex: dragSourceIndex };
+
+    // Defer adding dragging class so default drag image renders clean
+    requestAnimationFrame(() => {
+      item.classList.add('dragging');
+    });
+  });
+
+  list.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+
+    const target = e.target.closest('.olahraga-exercise-item');
+    if (!target || dragSourceIndex === null) return;
+
+    const items = [...list.querySelectorAll('.olahraga-exercise-item')];
+    const targetIndex = parseInt(target.dataset.index);
+    if (targetIndex === dragSourceIndex) return;
+
+    // Determine drop position: above or below target
+    const rect = target.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const before = e.clientY < midY;
+
+    // Remove all indicators
+    items.forEach(el => el.classList.remove('drop-before', 'drop-after'));
+
+    if (before) {
+      target.classList.add('drop-before');
+    } else {
+      target.classList.add('drop-after');
+    }
+  });
+
+  list.addEventListener('dragleave', (e) => {
+    const target = e.target.closest('.olahraga-exercise-item');
+    if (target) {
+      target.classList.remove('drop-before', 'drop-after');
+    }
+  });
+
+  list.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.olahraga-exercise-item');
+    if (!target || dragSourceIndex === null) return;
+
+    const targetIndex = parseInt(target.dataset.index);
+    if (targetIndex === dragSourceIndex) return;
+
+    const data = getHariAktifData();
+    if (!data) return;
+
+    const rect = target.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const before = e.clientY < midY;
+
+    // Calculate new index
+    let newIndex = targetIndex;
+    if (!before && targetIndex < dragSourceIndex) newIndex = targetIndex + 1;
+    else if (before && targetIndex > dragSourceIndex) newIndex = targetIndex - 1;
+    if (newIndex === dragSourceIndex) return;
+
+    // Reorder array
+    const [moved] = data.latihan.splice(dragSourceIndex, 1);
+    data.latihan.splice(newIndex, 0, moved);
+
+    // Update durasi
+    data.durasi = data.latihan.reduce((sum, ex) => {
+      const repNum = parseInt(ex.rep) || 10;
+      return sum + Math.ceil((ex.set * repNum * 30) / 60);
+    }, 0);
+
+    simpanOlahraga(data).then(() => {
+      render();
+      tampilkanToast('Urutan diperbarui', 'info');
+    });
+  });
+
+  list.addEventListener('dragend', () => {
+    dragSourceIndex = null;
+    _dragState = null;
+    list.querySelectorAll('.olahraga-exercise-item').forEach(el => {
+      el.classList.remove('dragging', 'drop-before', 'drop-after');
+    });
+  });
 }
 
 // ─── FORM MODAL ───────────────────────────────────────────
@@ -469,6 +575,7 @@ export async function mount(container) {
 
 export function unmount() {
   cleanupSwipe();
+  _dragState = null;
   _container = null;
   _data = [];
 }
