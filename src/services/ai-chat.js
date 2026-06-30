@@ -1,6 +1,3 @@
-const API_BASE = 'https://integrate.api.nvidia.com/v1';
-const MODEL = 'deepseek-ai/deepseek-v4-pro';
-
 let apiKey = '';
 
 export function setApiKey(key) {
@@ -26,27 +23,17 @@ export async function kirimPesan(riwayat, pesanBaru, sistemPrompt, dataKonteks) 
     { role: 'user', content: pesanBaru },
   ];
 
-  const response = await fetch(`${API_BASE}/chat/completions`, {
+  const response = await fetch('/api/chat', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages,
-      temperature: 0.7,
-      top_p: 0.95,
-      max_tokens: 4096,
-      extra_body: { chat_template_kwargs: { thinking: false } },
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages, apiKey }),
   });
 
   if (!response.ok) {
     let errMsg = `Gagal terhubung ke AI (${response.status})`;
     try {
       const err = await response.json();
-      errMsg = err.error?.message || err.message || errMsg;
+      errMsg = err.error || err.message || errMsg;
     } catch {}
     throw new Error(errMsg);
   }
