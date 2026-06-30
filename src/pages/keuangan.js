@@ -471,39 +471,37 @@ function bukaFormTransaksi(existing) {
     ],
   });
 
-  // Bind tipe toggle
-  konten.querySelectorAll('.keuangan-form-tipe-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      tipe = btn.dataset.tipe;
-      if (!existing) {
-        kategori = '';
-        asalAset = _aset[0]?.id || '';
-        tujuanAset = _aset[1]?.id || _aset[0]?.id || '';
-      }
-      konten.innerHTML = renderForm();
-      updateModalBody('');
-      sheet.querySelector('.modal-body').appendChild(konten);
-      bindFormEvents(konten);
-      if (window.lucide) window.lucide.createIcons();
-    });
-  });
-
   bindFormEvents(konten);
 
   setTimeout(() => {
     const inp = konten.querySelector('#keu-jumlah');
     if (inp) inp.focus();
   }, 400);
-}
 
-function bindFormEvents(konten) {
-  // Kategori buttons
-  konten.querySelectorAll('.keuangan-kategori-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      konten.querySelectorAll('.keuangan-kategori-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+  function bindFormEvents(konten) {
+    // Kategori buttons
+    konten.querySelectorAll('.keuangan-kategori-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        konten.querySelectorAll('.keuangan-kategori-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
     });
-  });
+
+    // Tipe toggle
+    konten.querySelectorAll('.keuangan-form-tipe-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        tipe = btn.dataset.tipe;
+        if (!existing) {
+          kategori = '';
+          asalAset = _aset[0]?.id || '';
+          tujuanAset = _aset[1]?.id || _aset[0]?.id || '';
+        }
+        konten.innerHTML = renderForm();
+        bindFormEvents(konten);
+        if (window.lucide) window.lucide.createIcons();
+      });
+    });
+  }
 }
 
 // ─── MOUNT / UNMOUNT ──────────────────────────────────────
