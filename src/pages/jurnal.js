@@ -2,6 +2,7 @@ import { getJurnalByTanggal, simpanJurnal } from '../store.js';
 import { formatTanggalPanjang, formatTanggalPendek } from '../utils/date-utils.js';
 import { escapeHtml, kompresGambar } from '../utils/helpers.js';
 import { tampilkanToast } from '../components/toast.js';
+import { generatePrompts } from '../ai-prompts.js';
 import '../styles/jurnal.css';
 import '../styles/components.css';
 
@@ -11,6 +12,8 @@ let state = {
   konten: '',
   tags: [],
   foto: [],
+  aiPrompts: [],
+  showAiPrompts: false,
 };
 
 const DEFAULT_TAGS = ['Kerja', 'Keluarga', 'Kesehatan', 'Belajar', 'Hobi'];
@@ -31,7 +34,7 @@ export async function mount(container) {
     state.tags    = dataExisting.tags    ?? [...DEFAULT_TAGS];
     state.foto    = dataExisting.foto    ?? [];
   } else {
-    state = { mood: null, konten: '', tags: [...DEFAULT_TAGS], foto: [] };
+    state = { mood: null, konten: '', tags: [...DEFAULT_TAGS], foto: [], aiPrompts: [], showAiPrompts: false };
   }
 
   container.innerHTML = renderPage();
@@ -60,6 +63,7 @@ function renderPage() {
         ${renderTanggal()}
         ${renderMoodCard()}
         ${renderTulisCard()}
+        ${renderAiPrompts()}
         ${renderTagsCard()}
         ${renderFotoCard()}
       </div>
@@ -139,6 +143,44 @@ function renderTulisCard() {
         placeholder="Ceritakan tentang hari mu... Apa yang kamu rasakan? Apa yang kamu pelajari?"
         aria-label="Isi jurnal"
       >${escapeHtml(state.konten)}</textarea>
+    </div>
+  `;
+}
+
+function renderAiPrompts() {
+  const promptsHtml = state.aiPrompts.map((p, i) => `
+    <button class="ai-prompt-chip" data-prompt-idx="${i}">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a4 4 0 014 4c0 2-2 4-4 6-2-2-4-4-4-6a4 4 0 014-4z"/>
+        <path d="M12 2v8"/>
+        <path d="M2 12h20"/>
+        <path d="M12 22v-4"/>
+        <path d="M8 22h8"/>
+      </svg>
+      ${escapeHtml(p)}
+    </button>
+  `).join('');
+
+  return `
+    <div class="ai-prompts-card" id="aiPromptsCard">
+      <div class="ai-prompts-header">
+        <button class="ai-prompt-btn${state.showAiPrompts ? ' active' : ''}" id="btnAiPrompt" aria-label="Ide dari AI">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a4 4 0 014 4c0 2-2 4-4 6-2-2-4-4-4-6a4 4 0 014-4z"/>
+            <path d="M12 2v8"/>
+            <path d="M2 12h20"/>
+            <path d="M12 22v-4"/>
+            <path d="M8 22h8"/>
+          </svg>
+          Ide dari AI
+        </button>
+      </div>
+      ${state.showAiPrompts ? `
+        <div class="ai-prompts-body">
+          <p class="ai-prompts-label">Pilih pertanyaan untuk memulai menulis:</p>
+          <div class="ai-prompts-list">${promptsHtml}</div>
+        </div>
+      ` : ''}
     </div>
   `;
 }
@@ -232,6 +274,9 @@ function bindEvents(container) {
       container.querySelectorAll('.mood-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.mood === mood);
       });
+      // Reset AI prompts saat mood berubah
+      state.showAiPrompts = false;
+      rerenderAiPrompts(container);
       jadwalkanAutoSave(container);
     });
   });
@@ -248,6 +293,41 @@ function bindEvents(container) {
       jadwalkanAutoSave(container);
     });
   }
+
+  // AI Prompt — generate
+  container.querySelector('#btnAiPrompt')?.addEventListener('click', () => {
+    if (!state.mood) {
+      tampilkanToast('Pilih mood dulu ya 😊', 'info');
+      return;
+    }
+    state.showAiPrompts = !state.showAiPrompts;
+    if (state.showAiPrompts) {
+      state.aiPrompts = generatePrompts(state.mood);
+    }
+    rerenderAiPrompts(container);
+  });
+
+  // AI Prompt — pilih chip
+  container.querySelector('#aiPromptsCard')?.addEventListener('click', e => {
+    const chip = e.target.closest('.ai-prompt-chip');
+    if (!chip) return;
+    const idx = parseInt(chip.dataset.promptIdx, 10);
+    const prompt = state.aiPrompts[idx];
+    if (!prompt) return;
+    const ta = container.querySelector('#jurnalTextarea');
+    if (ta) {
+      state.konten = prompt + '\n\n' + state.konten;
+      ta.value = state.konten;
+      const cc = container.querySelector('#charCount');
+      if (cc) cc.textContent = `${state.konten.length} karakter`;
+      autoResize(ta);
+      state.showAiPrompts = false;
+      rerenderAiPrompts(container);
+      jadwalkanAutoSave(container);
+      ta.focus();
+      ta.setSelectionRange(prompt.length + 2, prompt.length + 2);
+    }
+  });
 
   // Tags — toggle
   container.querySelector('#tagsWrap')?.addEventListener('click', e => {
@@ -390,6 +470,48 @@ function setSaveIndicator(container, status) {
   } else {
     text.textContent = 'Belum ada perubahan';
   }
+}
+
+// ─── AI PROMPT HELPERS ────────────────────────────────────────
+function rerenderAiPrompts(container) {
+  const wrap = container.querySelector('#aiPromptsCard');
+  if (!wrap) return;
+  const newHtml = renderAiPrompts();
+  wrap.outerHTML = newHtml;
+
+  // Re-bind events
+  container.querySelector('#btnAiPrompt')?.addEventListener('click', () => {
+    if (!state.mood) {
+      tampilkanToast('Pilih mood dulu ya 😊', 'info');
+      return;
+    }
+    state.showAiPrompts = !state.showAiPrompts;
+    if (state.showAiPrompts) {
+      state.aiPrompts = generatePrompts(state.mood);
+    }
+    rerenderAiPrompts(container);
+  });
+
+  container.querySelector('#aiPromptsCard')?.addEventListener('click', e => {
+    const chip = e.target.closest('.ai-prompt-chip');
+    if (!chip) return;
+    const idx = parseInt(chip.dataset.promptIdx, 10);
+    const prompt = state.aiPrompts[idx];
+    if (!prompt) return;
+    const ta = container.querySelector('#jurnalTextarea');
+    if (ta) {
+      state.konten = prompt + '\n\n' + state.konten;
+      ta.value = state.konten;
+      const cc = container.querySelector('#charCount');
+      if (cc) cc.textContent = `${state.konten.length} karakter`;
+      autoResize(ta);
+      state.showAiPrompts = false;
+      rerenderAiPrompts(container);
+      jadwalkanAutoSave(container);
+      ta.focus();
+      ta.setSelectionRange(prompt.length + 2, prompt.length + 2);
+    }
+  });
 }
 
 // ─── TAGS HELPERS ─────────────────────────────────────────────
