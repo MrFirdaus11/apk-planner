@@ -10,6 +10,9 @@ export default async function handler(request, response) {
       return response.status(400).json({ error: 'API key diperlukan' });
     }
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     const apiResponse = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -24,7 +27,10 @@ export default async function handler(request, response) {
         max_tokens: 4096,
         extra_body: { chat_template_kwargs: { thinking: false } },
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeout);
 
     if (!apiResponse.ok) {
       const err = await apiResponse.json().catch(() => ({}));
@@ -36,6 +42,9 @@ export default async function handler(request, response) {
     const data = await apiResponse.json();
     return response.status(200).json(data);
   } catch (err) {
+    if (err.name === 'AbortError') {
+      return response.status(504).json({ error: 'AI tidak merespon, coba pertanyaan yang lebih sederhana' });
+    }
     return response.status(500).json({ error: err.message || 'Terjadi kesalahan internal' });
   }
 }

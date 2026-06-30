@@ -1,5 +1,5 @@
 import { escapeHtml } from '../utils/helpers.js';
-import { hasApiKey, kirimPesan } from '../services/ai-chat.js';
+import { hasApiKey, kirimPesan, abortPesan } from '../services/ai-chat.js';
 import { getSystemPrompt, getDataKonteks } from '../services/knowledge-base.js';
 import '../styles/chat.css';
 
@@ -47,10 +47,9 @@ export function openChat() {
   });
   sendBtn.addEventListener('click', handleSend);
   input.addEventListener('input', () => {
-    sendBtn.disabled = !input.value.trim();
+    if (!isSending) sendBtn.disabled = !input.value.trim();
   });
 
-  // Template chips
   container.querySelectorAll('.chat-template-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       const text = chip.textContent.trim();
@@ -67,7 +66,9 @@ export function openChat() {
 
 export function closeChat() {
   if (!isOpen) return;
+  abortPesan();
   isOpen = false;
+  isSending = false;
   const container = document.getElementById('chat-container');
   container.innerHTML = '';
   renderFab();
@@ -114,6 +115,9 @@ function renderChatSheet() {
           </div>
           <button class="chat-send-btn" id="chat-send-btn" disabled>
             <i data-lucide="send" width="16" height="16"></i>
+          </button>
+          <button class="chat-stop-btn" id="chat-stop-btn" style="display:none;">
+            <i data-lucide="square" width="14" height="14"></i>
           </button>
         </div>
       </div>
@@ -196,11 +200,28 @@ function hideTyping() {
   if (el) el.remove();
 }
 
+function setLoadingState(loading) {
+  const input = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('chat-send-btn');
+  const stopBtn = document.getElementById('chat-stop-btn');
+  if (!input || !sendBtn || !stopBtn) return;
+
+  isSending = loading;
+  input.disabled = loading;
+  if (loading) {
+    sendBtn.style.display = 'none';
+    stopBtn.style.display = 'flex';
+  } else {
+    sendBtn.style.display = 'flex';
+    stopBtn.style.display = 'none';
+    sendBtn.disabled = !input.value.trim();
+  }
+}
+
 async function handleSend() {
   if (isSending) return;
 
   const input = document.getElementById('chat-input');
-  const sendBtn = document.getElementById('chat-send-btn');
   const text = input.value.trim();
   if (!text) return;
 
@@ -210,11 +231,18 @@ async function handleSend() {
   }
 
   input.value = '';
-  sendBtn.disabled = true;
-  isSending = true;
+  setLoadingState(true);
+
+  const stopBtn = document.getElementById('chat-stop-btn');
+  const handleStop = () => {
+    abortPesan();
+    addMessage('error', 'Pesan dibatalkan');
+    setLoadingState(false);
+    stopBtn.removeEventListener('click', handleStop);
+  };
+  stopBtn.addEventListener('click', handleStop);
 
   addMessage('user', text);
-
   showTyping();
 
   try {
@@ -234,8 +262,11 @@ async function handleSend() {
     addMessage('assistant', jawaban);
   } catch (err) {
     hideTyping();
-    addMessage('error', err.message || 'Terjadi kesalahan. Coba lagi nanti.');
+    if (err.message !== 'Dibatalkan') {
+      addMessage('error', err.message || 'Terjadi kesalahan. Coba lagi nanti.');
+    }
   } finally {
-    isSending = false;
+    setLoadingState(false);
+    stopBtn.removeEventListener('click', handleStop);
   }
 }

@@ -319,6 +319,24 @@
   cursor: not-allowed;
 }
 
+/* ─── STOP BUTTON ──────────────────────────────────────────── */
+.chat-stop-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--danger);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  animation: scaleIn 0.2s ease;
+  transition: all var(--transition-fast);
+}
+.chat-stop-btn:active { transform: scale(0.92); }
+
 /* ─── ERROR MESSAGE ─────────────────────────────────────────── */
 .chat-msg.error .chat-msg-bubble {
   background: var(--danger-bg);
