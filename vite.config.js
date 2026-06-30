@@ -17,7 +17,8 @@ export default defineConfig({
             let body = '';
             req.on('data', chunk => body += chunk);
             req.on('end', async () => {
-              const { messages, apiKey } = JSON.parse(body);
+              const parsed = JSON.parse(body);
+              const { messages, apiKey, max_tokens = 512, model } = parsed;
               if (!apiKey) {
                 res.statusCode = 400;
                 res.end(JSON.stringify({ error: 'API key diperlukan' }));
@@ -30,12 +31,11 @@ export default defineConfig({
                   Authorization: `Bearer ${apiKey}`,
                 },
                 body: JSON.stringify({
-                  model: 'deepseek-ai/deepseek-v4-pro',
+                  model: model || 'meta/llama-3.1-8b-instruct',
                   messages,
                   temperature: 0.7,
                   top_p: 0.95,
-                  max_tokens: 4096,
-                  extra_body: { chat_template_kwargs: { thinking: false } },
+                  max_tokens,
                 }),
               });
               const data = await apiRes.json();

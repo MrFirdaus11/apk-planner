@@ -43,7 +43,7 @@ export async function kirimPesan(riwayat, pesanBaru, sistemPrompt, dataKonteks) 
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, apiKey, max_tokens: 512 }),
+      body: JSON.stringify({ messages, apiKey, max_tokens: 512, model: 'meta/llama-3.1-8b-instruct' }),
       signal,
     });
 

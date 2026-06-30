@@ -4,13 +4,14 @@ export default async function handler(request, response) {
   }
 
   try {
-    let { messages, apiKey, max_tokens = 512 } = request.body;
+    let { messages, apiKey, max_tokens = 512, model } = request.body;
 
     if (!apiKey) {
       return response.status(400).json({ error: 'API key diperlukan' });
     }
 
     if (typeof max_tokens !== 'number') max_tokens = 512;
+    if (!model) model = 'meta/llama-3.1-8b-instruct';
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 25000);
@@ -22,7 +23,7 @@ export default async function handler(request, response) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'deepseek-ai/deepseek-v4-pro',
+        model,
         messages,
         temperature: 0.7,
         top_p: 0.95,
@@ -35,8 +36,12 @@ export default async function handler(request, response) {
 
     if (!apiResponse.ok) {
       const err = await apiResponse.json().catch(() => ({}));
+      const msg = err.error?.message || err.message || '';
+      if (apiResponse.status === 429) {
+        return response.status(429).json({ error: 'Terlalu banyak permintaan atau kuota API habis. Tunggu beberapa saat atau gunakan API key lain.' });
+      }
       return response.status(apiResponse.status).json({
-        error: err.error?.message || `Gagal terhubung ke AI (${apiResponse.status})`,
+        error: msg || `Gagal terhubung ke AI (${apiResponse.status})`,
       });
     }
 
