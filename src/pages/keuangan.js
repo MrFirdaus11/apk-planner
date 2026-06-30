@@ -96,9 +96,9 @@ function render() {
           <p class="page-subtitle">${getNamaBulan(_bulan)} ${_tahun}</p>
         </div>
         <button class="keuangan-periode" id="keuangan-periode-btn" title="Ganti bulan">
-          <i data-lucide="chevron-left" width="14" height="14" id="keuangan-bulan-prev"></i>
-          ${getNamaBulan(_bulan)}
-          <i data-lucide="chevron-right" width="14" height="14" id="keuangan-bulan-next"></i>
+          <span data-nav="prev"><i data-lucide="chevron-left" width="14" height="14"></i></span>
+          <span class="keuangan-periode-nama" id="keuangan-periode-nama">${getNamaBulan(_bulan)}</span>
+          <span data-nav="next"><i data-lucide="chevron-right" width="14" height="14"></i></span>
         </button>
       </div>
 
@@ -223,23 +223,22 @@ function bindEvents() {
     });
   });
 
-  // Periode buttons
-  const prevBtn = document.getElementById('keuangan-bulan-prev');
-  const nextBtn = document.getElementById('keuangan-bulan-next');
-  if (prevBtn) {
-    prevBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      _bulan--;
-      if (_bulan < 1) { _bulan = 12; _tahun--; }
-      render();
-    });
-  }
-  if (nextBtn) {
-    nextBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      _bulan++;
-      if (_bulan > 12) { _bulan = 1; _tahun++; }
-      render();
+  // Periode — prev/next & month picker
+  const periodeBtn = document.getElementById('keuangan-periode-btn');
+  if (periodeBtn) {
+    periodeBtn.addEventListener('click', async (e) => {
+      const navSpan = e.target.closest('[data-nav]');
+      if (navSpan) {
+        const arah = navSpan.dataset.nav;
+        if (arah === 'prev') _bulan--;
+        else _bulan++;
+        if (_bulan < 1) { _bulan = 12; _tahun--; }
+        if (_bulan > 12) { _bulan = 1; _tahun++; }
+        await loadData();
+        render();
+      } else {
+        bukaMonthPicker();
+      }
     });
   }
 
@@ -500,6 +499,97 @@ function bukaFormTransaksi(existing) {
         bindFormEvents(konten);
         if (window.lucide) window.lucide.createIcons();
       });
+    });
+  }
+}
+
+// ─── MONTH PICKER ─────────────────────────────────────────
+async function bukaMonthPicker() {
+  let tahun = _tahun;
+  let bulan = _bulan;
+
+  function renderPicker() {
+    return `
+      <div class="month-picker">
+        <div class="month-picker-year">
+          <button class="month-picker-year-btn" id="mp-tahun-prev">
+            <i data-lucide="chevron-left" width="16" height="16"></i>
+          </button>
+          <span class="month-picker-year-label">${tahun}</span>
+          <button class="month-picker-year-btn" id="mp-tahun-next">
+            <i data-lucide="chevron-right" width="16" height="16"></i>
+          </button>
+        </div>
+        <div class="month-picker-grid">
+          ${BULAN.map((nama, i) => {
+            const m = i + 1;
+            const isActive = tahun === _tahun && m === _bulan;
+            const isSelected = tahun === tahun && m === bulan;
+            return `
+              <button class="month-picker-btn${isSelected ? ' selected' : ''}${isActive ? ' active' : ''}" data-bulan="${m}">
+                ${nama.slice(0, 3)}
+              </button>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const konten = document.createElement('div');
+  konten.innerHTML = renderPicker();
+
+  const sheet = bukaModal({
+    judul: 'Pilih Bulan',
+    konten,
+    ukuran: 'normal',
+    aksi: [
+      { label: 'Batal', kelas: 'btn-ghost', onClick: tutupModal },
+      {
+        label: 'Pilih', kelas: 'btn-primary', icon: 'check',
+        onClick: () => {
+          _tahun = tahun;
+          _bulan = bulan;
+          tutupModal();
+          loadData().then(() => render());
+        }
+      },
+    ],
+  });
+
+  // Year nav
+  konten.querySelector('#mp-tahun-prev')?.addEventListener('click', () => {
+    tahun--;
+    konten.innerHTML = renderPicker();
+    bindPickerEvents();
+    if (window.lucide) window.lucide.createIcons();
+  });
+  konten.querySelector('#mp-tahun-next')?.addEventListener('click', () => {
+    tahun++;
+    konten.innerHTML = renderPicker();
+    bindPickerEvents();
+    if (window.lucide) window.lucide.createIcons();
+  });
+
+  function bindPickerEvents() {
+    konten.querySelectorAll('.month-picker-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        konten.querySelectorAll('.month-picker-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        bulan = parseInt(btn.dataset.bulan, 10);
+      });
+    });
+    konten.querySelector('#mp-tahun-prev')?.addEventListener('click', () => {
+      tahun--;
+      konten.innerHTML = renderPicker();
+      bindPickerEvents();
+      if (window.lucide) window.lucide.createIcons();
+    });
+    konten.querySelector('#mp-tahun-next')?.addEventListener('click', () => {
+      tahun++;
+      konten.innerHTML = renderPicker();
+      bindPickerEvents();
+      if (window.lucide) window.lucide.createIcons();
     });
   }
 }
