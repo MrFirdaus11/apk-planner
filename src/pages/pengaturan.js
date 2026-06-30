@@ -2,6 +2,8 @@ import { exportData, downloadJson, parseFile, validasiData, importData } from '.
 import { getTheme, toggleTheme } from '../utils/theme.js';
 import { tampilkanToast } from '../components/toast.js';
 import { bukaModal, tutupModal } from '../components/modal.js';
+import { getApiKey, setApiKey } from '../store.js';
+import { setApiKey as setAiApiKey } from '../services/ai-chat.js';
 import '../styles/pengaturan.css';
 import '../styles/components.css';
 
@@ -83,6 +85,32 @@ function renderPage() {
       </div>
 
       <div class="pengaturan-section">
+        <h2 class="pengaturan-section-title">Kecerdasan Buatan</h2>
+        <p class="pengaturan-section-desc">
+          Atur API key untuk mengaktifkan fitur AI Chat. Gunakan NVIDIA API Key.
+          Dapatkan API key di <span style="color:var(--primary);">https://build.nvidia.com</span>
+        </p>
+
+        <div class="pengaturan-card">
+          <div class="pengaturan-card-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+          </div>
+          <div class="pengaturan-card-body" style="flex:1;">
+            <span class="pengaturan-card-title">API Key NVIDIA</span>
+            <input type="password" class="form-input" id="input-api-key" placeholder="nvapi-..." style="margin-top:6px;font-size:13px;padding:0.5rem 0.75rem;" />
+          </div>
+        </div>
+
+        <div style="display:flex;gap:var(--space-2);">
+          <button class="btn btn-primary" id="btn-save-apikey" style="flex:1;">Simpan API Key</button>
+          <button class="btn btn-ghost" id="btn-reset-chat">Reset Chat</button>
+        </div>
+      </div>
+
+      <div class="pengaturan-section">
         <h2 class="pengaturan-section-title">Tentang</h2>
         <div class="pengaturan-card pengaturan-card-about">
           <p><strong>APK Planner</strong> v1.0.0</p>
@@ -110,6 +138,38 @@ function bindEvents() {
   if (toggleDark) {
     toggleDark.addEventListener('change', () => {
       toggleTheme();
+    });
+  }
+
+  // Load saved API key
+  const apiKeyInput = document.getElementById('input-api-key');
+  if (apiKeyInput) {
+    getApiKey().then(key => {
+      if (key) {
+        apiKeyInput.value = key;
+        setAiApiKey(key);
+      }
+    });
+  }
+
+  const btnSave = document.getElementById('btn-save-apikey');
+  if (btnSave) {
+    btnSave.addEventListener('click', async () => {
+      const key = apiKeyInput.value.trim();
+      if (!key) {
+        tampilkanToast('Masukkan API Key terlebih dahulu', 'warning');
+        return;
+      }
+      await setApiKey(key);
+      setAiApiKey(key);
+      tampilkanToast('API Key berhasil disimpan!', 'success');
+    });
+  }
+
+  const btnReset = document.getElementById('btn-reset-chat');
+  if (btnReset) {
+    btnReset.addEventListener('click', () => {
+      tampilkanToast('Riwayat chat akan direset saat next session', 'info');
     });
   }
 }

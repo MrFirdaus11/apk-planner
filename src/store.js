@@ -299,6 +299,15 @@ export async function hapusAset(id) {
   await set('aset', semua.filter(a => a.id !== id));
 }
 
+// ─── AI CHAT ───────────────────────────────────────────────────────────────────
+export async function getApiKey() {
+  return (await get('apiKey')) || '';
+}
+
+export async function setApiKey(key) {
+  await set('apiKey', key);
+}
+
 export async function initAsetDefault() {
   const semua = await getSemuaAset();
   const { ASET_DEFAULT } = await import('./utils/constants.js');
