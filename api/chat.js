@@ -4,14 +4,16 @@ export default async function handler(request, response) {
   }
 
   try {
-    const { messages, apiKey } = request.body;
+    let { messages, apiKey, max_tokens = 512 } = request.body;
 
     if (!apiKey) {
       return response.status(400).json({ error: 'API key diperlukan' });
     }
 
+    if (typeof max_tokens !== 'number') max_tokens = 512;
+
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    const timeout = setTimeout(() => controller.abort(), 25000);
 
     const apiResponse = await fetch('https://integrate.api.nvidia.com/v1/chat/completions', {
       method: 'POST',
@@ -24,8 +26,7 @@ export default async function handler(request, response) {
         messages,
         temperature: 0.7,
         top_p: 0.95,
-        max_tokens: 4096,
-        extra_body: { chat_template_kwargs: { thinking: false } },
+        max_tokens,
       }),
       signal: controller.signal,
     });

@@ -263,7 +263,10 @@ async function handleSend() {
   } catch (err) {
     hideTyping();
     if (err.message !== 'Dibatalkan') {
-      addMessage('error', err.message || 'Terjadi kesalahan. Coba lagi nanti.');
+      const msg = err.message === 'AI tidak merespon, coba pertanyaan yang lebih sederhana'
+        ? err.message
+        : err.message || 'Terjadi kesalahan. Coba lagi nanti.';
+      addMessage('error', msg);
     }
   } finally {
     setLoadingState(false);

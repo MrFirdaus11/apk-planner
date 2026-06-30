@@ -37,13 +37,13 @@ export async function kirimPesan(riwayat, pesanBaru, sistemPrompt, dataKonteks) 
   const timeout = setTimeout(() => {
     abortController.abort();
     abortController = null;
-  }, 25000);
+  }, 15000);
 
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages, apiKey }),
+      body: JSON.stringify({ messages, apiKey, max_tokens: 512 }),
       signal,
     });
 
