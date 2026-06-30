@@ -755,13 +755,8 @@ export function unmount() {
     clearInterval(timerInterval);
     timerInterval = null;
   }
-  // Simpan state terakhir ke sessionStorage
   if (state) {
-    state.berjalan   = false;
     state.waktuMulai = Date.now();
-    simpanStateSession();
-    // Re-set berjalan agar rekonsiliasi bisa hitung selisih waktu
-    state.berjalan = true;
     simpanStateSession();
   }
   document.removeEventListener('click', tutupDropdownOutside);
