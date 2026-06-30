@@ -53,7 +53,7 @@ export const BULAN = [
 ];
 
 export const MOOD_LIST = [
-  { value: 'buruk', emoji: '😟', label: 'Kurang Baik' },
+  { value: 'kurang', emoji: '😟', label: 'Kurang Baik' },
   { value: 'biasa', emoji: '😐', label: 'Biasa Saja' },
   { value: 'baik', emoji: '😊', label: 'Sangat Baik' },
 ];

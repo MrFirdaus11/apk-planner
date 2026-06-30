@@ -1,8 +1,9 @@
-import { getJurnalByTanggal, simpanJurnal } from '../store.js';
-import { formatTanggalPanjang, formatTanggalPendek } from '../utils/date-utils.js';
+import { getSemuaJurnal, simpanJurnal } from '../store.js';
+import { formatTanggalPanjang, formatTanggalPendek, getNamaHari } from '../utils/date-utils.js';
 import { escapeHtml, kompresGambar } from '../utils/helpers.js';
 import { tampilkanToast } from '../components/toast.js';
 import { generatePrompts } from '../ai-prompts.js';
+import { MOOD_LIST } from '../utils/constants.js';
 import '../styles/jurnal.css';
 import '../styles/components.css';
 
@@ -14,6 +15,8 @@ let state = {
   foto: [],
   aiPrompts: [],
   showAiPrompts: false,
+  riwayat: [],
+  expandedRiwayat: {},
 };
 
 const DEFAULT_TAGS = ['Kerja', 'Keluarga', 'Kesehatan', 'Belajar', 'Hobi'];
@@ -24,18 +27,23 @@ let containerEl = null;
 export async function mount(container) {
   containerEl = container;
 
-  // Load data hari ini
   const tanggalHariIni = formatTanggalPendek();
-  const dataExisting = await getJurnalByTanggal(tanggalHariIni);
 
-  if (dataExisting) {
-    state.mood    = dataExisting.mood    ?? null;
-    state.konten  = dataExisting.konten  ?? '';
-    state.tags    = dataExisting.tags    ?? [...DEFAULT_TAGS];
-    state.foto    = dataExisting.foto    ?? [];
-  } else {
-    state = { mood: null, konten: '', tags: [...DEFAULT_TAGS], foto: [], aiPrompts: [], showAiPrompts: false };
-  }
+  // Always start fresh for today
+  state.mood = null;
+  state.konten = '';
+  state.tags = [...DEFAULT_TAGS];
+  state.foto = [];
+  state.aiPrompts = [];
+  state.showAiPrompts = false;
+
+  // Load history: all entries sorted by date descending, excluding today
+  const semua = await getSemuaJurnal();
+  const sorted = [...semua]
+    .filter(e => e.tanggal !== tanggalHariIni)
+    .sort((a, b) => b.tanggal.localeCompare(a.tanggal));
+  state.riwayat = sorted;
+  state.expandedRiwayat = {};
 
   container.innerHTML = renderPage();
   bindEvents(container);
@@ -66,6 +74,7 @@ function renderPage() {
         ${renderAiPrompts()}
         ${renderTagsCard()}
         ${renderFotoCard()}
+        ${renderRiwayat()}
       </div>
       <input type="file" id="fotoInput" accept="image/*" multiple style="display:none">
       <input type="file" id="kameraInput" accept="image/*" capture="environment" style="display:none">
@@ -255,6 +264,79 @@ function renderFotoCard() {
   `;
 }
 
+// ─── RIWAYAT ──────────────────────────────────────────────────
+function renderRiwayat() {
+  if (state.riwayat.length === 0) return '';
+
+  const cardsHtml = state.riwayat.map(e => renderRiwayatCard(e)).join('');
+
+  return `
+    <div class="riwayat-section">
+      <div class="riwayat-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Riwayat Jurnal
+      </div>
+      <div class="riwayat-list" id="riwayatList">
+        ${cardsHtml}
+      </div>
+    </div>
+  `;
+}
+
+function renderRiwayatCard(entry) {
+  const moodInfo = MOOD_LIST.find(m => m.value === entry.mood);
+  const moodEmoji = moodInfo?.emoji || '';
+  const moodLabel = moodInfo?.label || '';
+  const tgl = entry.tanggal || '';
+  const [tahun, bulan, hari] = tgl.split('-').map(Number);
+  const dateObj = new Date(tahun, bulan - 1, hari);
+  const namaHari = getNamaHari(dateObj, true);
+  const tglDisplay = `${namaHari}, ${hari} ${['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'][bulan - 1]} ${tahun}`;
+
+  const preview = (entry.konten || '').slice(0, 100);
+  const isExpanded = state.expandedRiwayat[entry.tanggal];
+
+  const tagsHtml = (entry.tags || [])
+    .filter(t => typeof t === 'object' ? t.aktif : true)
+    .map(t => {
+      const label = typeof t === 'object' ? t.label : t;
+      return `<span class="riwayat-tag">${escapeHtml(label)}</span>`;
+    }).join('');
+
+  const fotoHtml = (entry.foto || []).map(src => `
+    <div class="riwayat-foto-item">
+      <img src="${src}" alt="" loading="lazy">
+    </div>
+  `).join('');
+
+  return `
+    <div class="riwayat-card${isExpanded ? ' expanded' : ''}" data-tanggal="${tgl}">
+      <div class="riwayat-card-header">
+        <div class="riwayat-card-left">
+          <span class="riwayat-mood">${moodEmoji}</span>
+          <div class="riwayat-card-info">
+            <span class="riwayat-card-tanggal">${tglDisplay}</span>
+            ${!isExpanded && preview ? `<span class="riwayat-preview">${escapeHtml(preview)}${entry.konten.length > 100 ? '...' : ''}</span>` : ''}
+          </div>
+        </div>
+        <svg class="riwayat-expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      ${isExpanded ? `
+        <div class="riwayat-card-body">
+          ${moodLabel ? `<div class="riwayat-mood-label">${moodEmoji} ${moodLabel}</div>` : ''}
+          ${entry.konten ? `<div class="riwayat-konten">${escapeHtml(entry.konten).replace(/\n/g, '<br>')}</div>` : ''}
+          ${tagsHtml ? `<div class="riwayat-tags">${tagsHtml}</div>` : ''}
+          ${fotoHtml ? `<div class="riwayat-foto-grid">${fotoHtml}</div>` : ''}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
 // ─── BIND EVENTS ──────────────────────────────────────────────
 function bindEvents(container) {
   // Tombol kembali — navigasi ke halaman jadwal
@@ -412,6 +494,34 @@ function bindEvents(container) {
       state.foto.splice(idx, 1);
       rerenderFoto(container);
       jadwalkanAutoSave(container);
+    }
+  });
+
+  // Riwayat — expand/collapse
+  container.querySelector('#riwayatList')?.addEventListener('click', e => {
+    const card = e.target.closest('.riwayat-card');
+    if (!card) return;
+    const tgl = card.dataset.tanggal;
+    if (!tgl) return;
+    state.expandedRiwayat[tgl] = !state.expandedRiwayat[tgl];
+    // Re-render hanya card yang diklik
+    const entry = state.riwayat.find(e => e.tanggal === tgl);
+    if (!entry) return;
+    const newHtml = renderRiwayatCard(entry);
+    card.outerHTML = newHtml;
+    // Re-bind event expand/collapse untuk card baru
+    const newCard = container.querySelector(`.riwayat-card[data-tanggal="${tgl}"]`);
+    if (newCard) {
+      newCard.addEventListener('click', e => {
+        const c = e.target.closest('.riwayat-card');
+        if (!c) return;
+        const t = c.dataset.tanggal;
+        if (!t) return;
+        state.expandedRiwayat[t] = !state.expandedRiwayat[t];
+        const en = state.riwayat.find(ev => ev.tanggal === t);
+        if (!en) return;
+        c.outerHTML = renderRiwayatCard(en);
+      });
     }
   });
 }

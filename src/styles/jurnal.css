@@ -635,3 +635,170 @@
   font-weight: 600;
   letter-spacing: 0.02em;
 }
+
+/* ─── RIWAYAT JURNAL ─────────────────────────────────────────── */
+.riwayat-section {
+  margin-top: var(--space-6);
+  border-top: 2px dashed var(--border-light);
+  padding-top: var(--space-5);
+}
+
+.riwayat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-4);
+}
+
+.riwayat-header svg {
+  color: var(--primary);
+}
+
+.riwayat-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.riwayat-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.riwayat-card:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 2px 12px rgba(108, 60, 225, 0.08);
+}
+
+.riwayat-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-4);
+}
+
+.riwayat-card-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  flex: 1;
+}
+
+.riwayat-mood {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+}
+
+.riwayat-card-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.riwayat-card-tanggal {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.riwayat-preview {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  line-height: 1.4;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.riwayat-expand-icon {
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+  transition: transform 0.2s ease;
+}
+
+.riwayat-card.expanded .riwayat-expand-icon {
+  transform: rotate(90deg);
+  color: var(--primary);
+}
+
+.riwayat-card-body {
+  padding: 0 var(--space-4) var(--space-4);
+  animation: fadeInUp 0.25s ease;
+}
+
+.riwayat-mood-label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+.riwayat-konten {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  color: var(--text);
+  white-space: pre-wrap;
+  margin-bottom: var(--space-3);
+}
+
+.riwayat-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.riwayat-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.625rem;
+  font-weight: 600;
+  background: var(--primary-lighter);
+  color: var(--primary);
+  letter-spacing: 0.02em;
+}
+
+.riwayat-foto-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.riwayat-foto-item {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--surface-2);
+}
+
+.riwayat-foto-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
