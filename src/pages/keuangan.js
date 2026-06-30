@@ -357,7 +357,7 @@ function bukaFormTransaksi(existing) {
 
       <div class="keuangan-form-group">
         <label class="keuangan-form-label">Jumlah (Rp)</label>
-        <input class="keuangan-form-input" type="number" id="keu-jumlah" min="0" placeholder="0" value="${jumlah}" inputmode="numeric" />
+        <input class="keuangan-form-input" type="text" id="keu-jumlah" inputmode="numeric" placeholder="0" value="${typeof jumlah === 'number' ? jumlah.toLocaleString('id-ID') : jumlah}" />
       </div>
 
       ${!isTransfer ? `
@@ -416,7 +416,7 @@ function bukaFormTransaksi(existing) {
         label: isEdit ? 'Simpan' : 'Tambah', kelas: 'btn-primary', icon: 'check',
         onClick: () => {
           const tipeBaru = konten.querySelector('.keuangan-form-tipe-btn.active')?.dataset.tipe;
-          const jumlahVal = parseFloat(konten.querySelector('#keu-jumlah')?.value);
+          const jumlahVal = parseFloat((konten.querySelector('#keu-jumlah')?.value || '').replace(/\./g, ''));
           const tanggalVal = konten.querySelector('#keu-tanggal')?.value;
           const catatanVal = konten.querySelector('#keu-catatan')?.value.trim() || '';
           const isTransfer = tipeBaru === 'transfer';
