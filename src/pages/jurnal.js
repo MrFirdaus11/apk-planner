@@ -22,6 +22,7 @@ let state = {
 const DEFAULT_TAGS = ['Kerja', 'Keluarga', 'Kesehatan', 'Belajar', 'Hobi'];
 let autoSaveTimer = null;
 let containerEl = null;
+let sebelumKeluarHandler = null;
 
 // ─── MOUNT ────────────────────────────────────────────────────
 export async function mount(container) {
@@ -49,6 +50,13 @@ export async function mount(container) {
 
   container.innerHTML = renderPage();
   bindEvents(container);
+
+  // Save on page leave (refresh/tab close/navigate away)
+  sebelumKeluarHandler = () => {
+    if (autoSaveTimer) clearTimeout(autoSaveTimer);
+    simpanData(container);
+  };
+  window.addEventListener('beforeunload', sebelumKeluarHandler);
 }
 
 // ─── UNMOUNT ──────────────────────────────────────────────────
@@ -56,6 +64,10 @@ export function unmount() {
   if (autoSaveTimer) {
     clearTimeout(autoSaveTimer);
     autoSaveTimer = null;
+  }
+  if (sebelumKeluarHandler) {
+    window.removeEventListener('beforeunload', sebelumKeluarHandler);
+    sebelumKeluarHandler = null;
   }
   containerEl = null;
 }
@@ -547,7 +559,7 @@ function autoResize(el) {
 function jadwalkanAutoSave(container) {
   setSaveIndicator(container, 'idle');
   if (autoSaveTimer) clearTimeout(autoSaveTimer);
-  autoSaveTimer = setTimeout(() => simpanData(container), 3000);
+  autoSaveTimer = setTimeout(() => simpanData(container), 1000);
 }
 
 async function simpanManual() {
