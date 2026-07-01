@@ -308,6 +308,14 @@ export async function setApiKey(key) {
   await set('apiKey', key);
 }
 
+export async function getChatHistory() {
+  return (await get('chatHistory')) || [];
+}
+
+export async function setChatHistory(history) {
+  await set('chatHistory', history);
+}
+
 export async function initAsetDefault() {
   const semua = await getSemuaAset();
   const { ASET_DEFAULT } = await import('./utils/constants.js');
