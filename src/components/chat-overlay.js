@@ -147,24 +147,27 @@ function renderSemuaPesan() {
     return;
   }
 
-  if (riwayat.length === 0) {
-    body.innerHTML = `
-      <div class="chat-welcome">
-        <div class="chat-welcome-icon"><i data-lucide="bot" width="24" height="24"></i></div>
-        <h3>Halo! Ada yang bisa dibantu?</h3>
-        <p>Tanya seputar aplikasi, tips produktivitas, atau keuangan.</p>
-        <div class="chat-templates">
-          ${TEMPLATE_QUESTIONS.map(q => `<button class="chat-template-chip">${escapeHtml(q)}</button>`).join('')}
-        </div>
-      </div>
-    `;
-    if (window.lucide) window.lucide.createIcons();
-    return;
-  }
-
   for (const msg of riwayat) {
     addMessageBubble(msg.role, msg.content);
   }
+
+  const footer = document.createElement('div');
+  footer.className = 'chat-templates-footer';
+  footer.innerHTML = `
+    ${riwayat.length === 0 ? `
+      <div class="chat-welcome" style="padding-top:var(--space-6);">
+        <div class="chat-welcome-icon"><i data-lucide="bot" width="24" height="24"></i></div>
+        <h3>Halo! Ada yang bisa dibantu?</h3>
+        <p>Tanya seputar aplikasi, tips produktivitas, atau keuangan.</p>
+      </div>
+    ` : ''}
+    <div class="chat-templates">
+      ${TEMPLATE_QUESTIONS.map(q => `<button class="chat-template-chip">${escapeHtml(q)}</button>`).join('')}
+    </div>
+  `;
+  body.appendChild(footer);
+
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function scrollToBottom() {
