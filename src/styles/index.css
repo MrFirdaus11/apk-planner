@@ -334,8 +334,8 @@ p  { font-size: var(--text-base); line-height: 1.6; }
 /* FAB */
 .fab {
   position: fixed;
-  bottom: 90px;
-  right: max(16px, calc(50% - 215px + 16px));
+  bottom: 88px;
+  left: max(16px, calc(50% - 215px + 16px));
   width: 56px;
   height: 56px;
   border-radius: var(--radius-full);
@@ -345,6 +345,8 @@ p  { font-size: var(--text-base); line-height: 1.6; }
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
+  cursor: pointer;
   box-shadow: var(--shadow-xl);
   transition: all var(--transition-base);
   z-index: 100;

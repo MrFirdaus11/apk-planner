@@ -1,4 +1,4 @@
-import { getSemuaJurnal, simpanJurnal } from '../store.js';
+import { getSemuaJurnal, getJurnalByTanggal, simpanJurnal } from '../store.js';
 import { formatTanggalPanjang, formatTanggalPendek, getNamaHari } from '../utils/date-utils.js';
 import { escapeHtml, kompresGambar } from '../utils/helpers.js';
 import { tampilkanToast } from '../components/toast.js';
@@ -29,11 +29,13 @@ export async function mount(container) {
 
   const tanggalHariIni = formatTanggalPendek();
 
-  // Always start fresh for today
-  state.mood = null;
-  state.konten = '';
-  state.tags = [...DEFAULT_TAGS];
-  state.foto = [];
+  // Load today's existing entry if any
+  const hariIni = await getJurnalByTanggal(tanggalHariIni);
+
+  state.mood = hariIni?.mood || null;
+  state.konten = hariIni?.konten || '';
+  state.tags = hariIni?.tags?.length ? hariIni.tags : [...DEFAULT_TAGS];
+  state.foto = hariIni?.foto || [];
   state.aiPrompts = [];
   state.showAiPrompts = false;
 
@@ -74,6 +76,14 @@ function renderPage() {
         ${renderAiPrompts()}
         ${renderTagsCard()}
         ${renderFotoCard()}
+        <button class="btn btn-primary jurnal-simpan-btn" id="btnSimpanBawah">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Simpan Jurnal
+        </button>
         ${renderRiwayat()}
       </div>
       <input type="file" id="fotoInput" accept="image/*" multiple style="display:none">
@@ -346,6 +356,7 @@ function bindEvents(container) {
 
   // Tombol simpan manual
   container.querySelector('#btnSimpan')?.addEventListener('click', () => simpanManual());
+  container.querySelector('#btnSimpanBawah')?.addEventListener('click', () => simpanManual());
 
   // Mood buttons
   container.querySelectorAll('.mood-btn').forEach(btn => {

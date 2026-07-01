@@ -636,6 +636,14 @@
   letter-spacing: 0.02em;
 }
 
+/* ─── SIMPAN BUTTON ──────────────────────────────────────────── */
+.jurnal-simpan-btn {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: var(--text-base);
+  margin-top: var(--space-2);
+}
+
 /* ─── RIWAYAT JURNAL ─────────────────────────────────────────── */
 .riwayat-section {
   margin-top: var(--space-6);
