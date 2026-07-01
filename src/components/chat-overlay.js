@@ -33,18 +33,19 @@ export function openChat() {
   const container = document.getElementById('chat-container');
   container.innerHTML = renderChatSheet();
 
+  const input = container.querySelector('.chat-input');
+  const sendBtn = container.querySelector('.chat-send-btn');
+
   loadRiwayat().then(() => {
     renderSemuaPesan();
     scrollToBottom();
+    bindTemplateChips(input, sendBtn);
   });
 
   container.querySelector('.chat-backdrop').addEventListener('click', e => {
     if (e.target === container.querySelector('.chat-backdrop')) closeChat();
   });
   container.querySelector('.chat-header-close').addEventListener('click', closeChat);
-
-  const input = container.querySelector('.chat-input');
-  const sendBtn = container.querySelector('.chat-send-btn');
 
   input.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -56,15 +57,6 @@ export function openChat() {
   input.addEventListener('input', () => {
     autoResizeInput(input);
     if (!isSending) sendBtn.disabled = !input.value.trim();
-  });
-
-  container.querySelectorAll('.chat-template-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const text = chip.textContent.trim();
-      input.value = text;
-      sendBtn.disabled = false;
-      handleSend();
-    });
   });
 
   requestAnimationFrame(() => input.focus());
@@ -259,6 +251,17 @@ function showRetryButton() {
   div.appendChild(btn);
   body.appendChild(div);
   scrollToBottom();
+}
+
+function bindTemplateChips(input, sendBtn) {
+  document.querySelectorAll('.chat-template-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const text = chip.textContent.trim();
+      input.value = text;
+      sendBtn.disabled = false;
+      handleSend();
+    });
+  });
 }
 
 async function handleSend() {
